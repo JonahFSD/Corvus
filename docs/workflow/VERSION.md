@@ -6,7 +6,8 @@
 | `mattpocock/skills`              | commit `66898f6`                  |
 | Codex CLI and SDK                | `0.144.6`                         |
 | Sandcastle                       | `0.12.0`                          |
-| Default orchestrator/implementer | `gpt-5.5`, high reasoning         |
+| Default orchestrator             | `gpt-5.6-sol`, high reasoning     |
+| Implementer agents               | `gpt-5.5`, high reasoning         |
 | Read-heavy researcher            | `gpt-5.6-terra`, medium reasoning |
 | Independent rubber duck          | `gpt-5.4`, xhigh reasoning        |
 
