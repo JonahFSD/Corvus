@@ -90,6 +90,36 @@ if (agents.byteLength > 6000) {
 const packageJson = JSON.parse(
   fs.readFileSync(path.join(root, "package.json"), "utf8")
 );
+if (
+  packageJson.scripts?.["sandcastle:image"] !==
+  "sandcastle docker build-image --image-name corvus-agentic"
+) {
+  failures.push("sandcastle:image must build the corvus-agentic image");
+}
+const sandcastleMain = fs.readFileSync(
+  path.join(root, ".sandcastle/main.ts"),
+  "utf8"
+);
+if (!sandcastleMain.includes('imageName: "corvus-agentic"')) {
+  failures.push(".sandcastle/main.ts must run the corvus-agentic image");
+}
+if (sandcastleMain.includes("git config")) {
+  failures.push("Sandcastle startup hooks must not mutate Git config");
+}
+const sandcastleDockerfile = fs.readFileSync(
+  path.join(root, ".sandcastle/Dockerfile"),
+  "utf8"
+);
+if (
+  !sandcastleDockerfile.includes(
+    'git config --system user.name "Corvus Agent"'
+  ) ||
+  !sandcastleDockerfile.includes(
+    'git config --system user.email "agent@local.invalid"'
+  )
+) {
+  failures.push("Sandcastle image must bake in system Git identity");
+}
 for (const [name, version] of Object.entries(
   packageJson.devDependencies ?? {}
 )) {

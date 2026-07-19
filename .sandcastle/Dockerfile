@@ -15,7 +15,7 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
   && apt-get update && apt-get install -y gh \
   && rm -rf /var/lib/apt/lists/*
 
-# Build-args for UID/GID alignment: sandcastle docker build-image
+# Build-args for UID/GID alignment: npm run sandcastle:image
 # defaults these to the host user's UID/GID so image-built files
 # and bind-mounted files share an owner without runtime chown.
 ARG AGENT_UID=1000
@@ -26,6 +26,11 @@ RUN groupmod -o -g $AGENT_GID node && usermod -o -u $AGENT_UID -g $AGENT_GID -d 
 
 # Install Codex CLI (run as root before USER agent)
 RUN npm install -g @openai/codex@0.144.6
+
+# Commit identity is baked into the image so sandbox startup never mutates
+# mounted repository config or the runtime home directory.
+RUN git config --system user.name "Corvus Agent" \
+  && git config --system user.email "agent@local.invalid"
 
 USER ${AGENT_UID}:${AGENT_GID}
 

@@ -68,6 +68,7 @@ and leaves the candidate for human diff review. The iteration limit is capped at
 Sandcastle factory:
 
 ```bash
+npm run sandcastle:image
 npm run sandbox:auth
 npm run sandcastle
 ```

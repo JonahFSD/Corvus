@@ -15,6 +15,7 @@
     "afk": "node scripts/run-afk.mjs",
     "review": "bash scripts/codex-review.sh",
     "sandbox:auth": "node scripts/bootstrap-sandbox-auth.mjs",
+    "sandcastle:image": "sandcastle docker build-image --image-name corvus-agentic",
     "sandcastle": "tsx .sandcastle/main.ts"
   },
   "engines": {
