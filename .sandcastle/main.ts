@@ -58,11 +58,7 @@ const sandboxProvider = () =>
 
 const hooks = {
   sandbox: {
-    onSandboxReady: [
-      { command: "npm ci", timeoutMs: 300_000 },
-      { command: "git config user.name 'Corvus Agent'" },
-      { command: "git config user.email 'agent@local.invalid'" },
-    ],
+    onSandboxReady: [{ command: "npm ci", timeoutMs: 300_000 }],
   },
 };
 

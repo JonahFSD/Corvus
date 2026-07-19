@@ -67,7 +67,7 @@ The `corvus-agentic` image has not yet been successfully built. The previous bui
 3. Build and inspect the pinned sandbox image:
 
    ```bash
-   npx sandcastle docker build-image
+   npm run sandcastle:image
    docker image inspect corvus-agentic --format '{{.Id}} {{.Architecture}}'
    docker run --rm --entrypoint codex corvus-agentic --version
    docker run --rm --entrypoint gh corvus-agentic --version
@@ -95,7 +95,7 @@ The `corvus-agentic` image has not yet been successfully built. The previous bui
 
    Only run `npm run sandcastle` if the result is empty; otherwise it will intentionally begin real ticket work. With no eligible ticket it should plan an empty frontier and exit cleanly using the ignored auth files.
 
-6. If all checks pass, make no further commit unless verification reveals a required repository fix. Report the delivered workflow, commit, CI/branch protection, safety boundaries, and the commands to start HITL (`Codex` + skills), native AFK (`npm run afk -- --max-iterations 1 --timeout-seconds 1800`), and Sandcastle (`npm run sandbox:auth && npm run sandcastle`). Explicitly mention that `.DS_Store` was preserved and excluded.
+6. If all checks pass, make no further commit unless verification reveals a required repository fix. Report the delivered workflow, commit, CI/branch protection, safety boundaries, and the commands to start HITL (`Codex` + skills), native AFK (`npm run afk -- --max-iterations 1 --timeout-seconds 1800`), and Sandcastle (`npm run sandcastle:image && npm run sandbox:auth && npm run sandcastle`). Explicitly mention that `.DS_Store` was preserved and excluded.
 
 ## Suggested skills
 
