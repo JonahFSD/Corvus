@@ -1,0 +1,194 @@
+[
+  {
+    "severity": "P2",
+    "category": "disposition",
+    "location": "Data Connection (Magritte):1",
+    "message": "file-level clone: simplify but sub-concepts are also ['drop'] \u2014 per-concept disposition is not tag-queryable",
+    "fix": "split doc or add per-section #clone tags (vault_tools normalize covers 04\u201310 only)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P2",
+    "category": "disposition",
+    "location": "Data Health & Lineage:1",
+    "message": "file-level clone: keep but sub-concepts are also ['simplify'] \u2014 per-concept disposition is not tag-queryable",
+    "fix": "split doc or add per-section #clone tags (vault_tools normalize covers 04\u201310 only)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P2",
+    "category": "disposition",
+    "location": "Dataset & Transactions:1",
+    "message": "file-level clone: keep but sub-concepts are also ['drop', 'simplify'] \u2014 per-concept disposition is not tag-queryable",
+    "fix": "split doc or add per-section #clone tags (vault_tools normalize covers 04\u201310 only)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P2",
+    "category": "disposition",
+    "location": "Transforms & Build:1",
+    "message": "file-level clone: simplify but sub-concepts are also ['keep'] \u2014 per-concept disposition is not tag-queryable",
+    "fix": "split doc or add per-section #clone tags (vault_tools normalize covers 04\u201310 only)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Links:1",
+    "message": "frontmatter kind: 'domain' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'domain' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P2",
+    "category": "footer",
+    "location": "Object Storage:1",
+    "message": "5 ## sections but 0 footer lines (*clone: \u2026*) \u2014 5 unstandardized",
+    "fix": "run `python3 vault_tools.py normalize --apply`",
+    "auto_fixable": true
+  },
+  {
+    "severity": "P3",
+    "category": "footer",
+    "location": "Object Storage:1",
+    "message": "5 ## sections but 0 inline #clone tag lines",
+    "fix": "run `python3 vault_tools.py normalize --apply`",
+    "auto_fixable": true
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Objects:1",
+    "message": "frontmatter kind: 'domain' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'domain' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Ontology & Metadata:1",
+    "message": "frontmatter kind: 'domain' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'domain' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Properties:1",
+    "message": "frontmatter kind: 'domain' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'domain' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Audit & Lineage:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Data-Level Security Policies:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Encryption, Network & Compliance:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Identity & Authentication:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Mandatory Controls & Classification:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Roles & Authorization:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Apollo & the Delivery Engine:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Ecosystem & Lineage:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Infrastructure Substrate:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Marketplace & Packaging:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P3",
+    "category": "vocabulary",
+    "location": "Releases, Channels & Promotion:1",
+    "message": "frontmatter kind: 'doc' is outside the documented kind vocabulary",
+    "fix": "use one of ['concept', 'mechanism', 'pattern', 'property', 'reference', 'service', 'type'] or document 'doc' in Taxonomy (Legend)",
+    "auto_fixable": false
+  },
+  {
+    "severity": "P2",
+    "category": "detritus",
+    "location": ".DS_Store",
+    "message": "committed OS cruft (.DS_Store)",
+    "fix": "git rm --cached and add to .gitignore (already ignored at Vault/.DS_Store)",
+    "auto_fixable": true
+  },
+  {
+    "severity": "P2",
+    "category": "detritus",
+    "location": ".junk/captest_1781388682/dirB/f.md",
+    "message": "scratch/capability-test file under .junk/ (gitignored but present on disk)",
+    "fix": "delete from working tree (rm -rf Vault/.junk)",
+    "auto_fixable": true
+  },
+  {
+    "severity": "P2",
+    "category": "detritus",
+    "location": ".junk/t.md",
+    "message": "scratch/capability-test file under .junk/ (gitignored but present on disk)",
+    "fix": "delete from working tree (rm -rf Vault/.junk)",
+    "auto_fixable": true
+  }
+]
