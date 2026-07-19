@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Start with a grill
+    url: https://github.com/JonahFSD/Corvus/blob/main/docs/workflow/README.md
+    about: Use a live grilling session for an idea that is not yet precise enough to ticket.

@@ -1,0 +1,30 @@
+{
+  "description": "Codex-native workflow health checks for Corvus.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/session-start.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking the agentic workflow control plane"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/stop-check.mjs\"",
+            "timeout": 60,
+            "statusMessage": "Checking workflow integrity before handoff"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+name: Bug or regression
+description: A reproducible behavior requiring triage and a red-capable loop.
+title: "Bug: "
+labels: ["needs-triage"]
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, versions, and evidence
+    validations:
+      required: true

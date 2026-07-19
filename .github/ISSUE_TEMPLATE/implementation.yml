@@ -1,0 +1,62 @@
+name: Implementation tracer bullet
+description: A small end-to-end behavior sliced from a reviewed spec.
+title: "Implement: "
+labels: ["needs-triage"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Originating spec
+      placeholder: "#123 — Spec title"
+    validations:
+      required: true
+  - type: textarea
+    id: story
+    attributes:
+      label: User story and observable behavior
+      placeholder: "As a ..., I can ..., so that ..."
+    validations:
+      required: true
+  - type: textarea
+    id: slice
+    attributes:
+      label: Vertical slice
+      description: Name every layer this tracer bullet must touch.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use observable, testable outcomes.
+    validations:
+      required: true
+  - type: textarea
+    id: seam
+    attributes:
+      label: Agreed test seam
+      description: Name the stable public boundary and why it is the right seam.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Blocking relationships
+      placeholder: "Blocked by ..., Blocks ..., or None"
+    validations:
+      required: true
+  - type: dropdown
+    id: execution
+    attributes:
+      label: Execution mode
+      options:
+        - AFK — fully specified and reversible
+        - HITL — requires live judgment
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Explicitly out of scope
+    validations:
+      required: true
