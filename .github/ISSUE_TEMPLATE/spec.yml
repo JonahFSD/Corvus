@@ -1,0 +1,41 @@
+name: Reviewed specification
+description: The destination produced after grilling, research, and prototyping.
+title: "Spec: "
+labels: ["spec", "ready-for-human"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution
+    validations:
+      required: true
+  - type: textarea
+    id: stories
+    attributes:
+      label: User stories
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation and module decisions
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing decisions and confirmed seams
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of scope
+    validations:
+      required: true

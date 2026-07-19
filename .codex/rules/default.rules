@@ -1,0 +1,50 @@
+# Destructive and externally publishing commands are never permitted through an
+# unattended Codex escalation. A human can run an intentional equivalent after
+# inspecting the exact target and diff.
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "forbidden",
+    justification = "Agents may create local commits; a human publishes after reading the diff.",
+    match = ["git push", "git push origin main", "git push --force"],
+)
+
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Use a recoverable, explicitly targeted alternative after inspecting worktree state.",
+    match = ["git reset --hard", "git reset --hard HEAD~1"],
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+    decision = "forbidden",
+    justification = "Do not bulk-delete untracked user files; resolve exact targets first.",
+    match = ["git clean -fd", "git clean -xdf"],
+)
+
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "Use an explicit recoverable operation against validated targets.",
+    match = ["rm -rf build", "rm -rf /tmp/example"],
+)
+
+prefix_rule(
+    pattern = ["gh", "repo", "delete"],
+    decision = "forbidden",
+    justification = "Repository deletion is outside the agent workflow.",
+    match = ["gh repo delete JonahFSD/Corvus"],
+)
+
+prefix_rule(
+    pattern = ["gh", "issue", ["create", "edit", "comment", "close"]],
+    decision = "prompt",
+    justification = "Issue mutations are workflow state changes and should be visible in HITL sessions.",
+    match = [
+        "gh issue create --title Test --body Test",
+        "gh issue edit 12 --add-label ready-for-agent",
+        "gh issue comment 12 --body done",
+        "gh issue close 12",
+    ],
+)

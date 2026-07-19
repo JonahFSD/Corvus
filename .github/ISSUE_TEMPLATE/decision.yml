@@ -1,0 +1,50 @@
+name: Wayfinder decision ticket
+description: One question whose resolution is a decision, not an implementation.
+title: "Decision: "
+labels: ["workflow:hitl"]
+body:
+  - type: input
+    id: map
+    attributes:
+      label: Parent Wayfinder map
+      placeholder: "#123 — Map title"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Decision type
+      options:
+        - grilling
+        - research
+        - prototype
+        - task
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: The single question
+      description: This ticket closes only when this question is resolved.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Known context and primary sources
+    validations:
+      required: true
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Blocked by
+      placeholder: "Named issue links, or None"
+    validations:
+      required: true
+  - type: textarea
+    id: resolution
+    attributes:
+      label: Resolution contract
+      description: Evidence or human confirmation required before closure.
+    validations:
+      required: true

@@ -1,0 +1,34 @@
+name: Final HITL QA
+description: Human acceptance ticket blocked by every implementation slice.
+title: "QA: "
+labels: ["ready-for-human", "workflow:hitl"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Originating spec
+    validations:
+      required: true
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Blocked by all implementation tickets
+    validations:
+      required: true
+  - type: textarea
+    id: scenarios
+    attributes:
+      label: Human acceptance scenarios
+    validations:
+      required: true
+  - type: checkboxes
+    id: review
+    attributes:
+      label: Required review
+      options:
+        - label: I read the actual diff, not only an agent summary.
+          required: true
+        - label: Standards-axis and Spec-axis reviews are present and resolved.
+          required: true
+        - label: The complete deterministic check passes.
+          required: true

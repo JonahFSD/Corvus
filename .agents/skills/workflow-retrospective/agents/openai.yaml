@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workflow Retrospective"
+  short_description: "Mine completed work for process improvements"
+  default_prompt: "Use $workflow-retrospective to extract actionable workflow improvements."

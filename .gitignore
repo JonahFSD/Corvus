@@ -1,1 +1,11 @@
 .DS_Store
+node_modules/
+.agent-runs/
+.codex-log/
+.sandcastle/.env
+.sandcastle/auth.json
+.sandcastle/worktrees/
+.env
+.env.*
+!.env.example
+!.sandcastle/.env.example

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rubber Duck Review"
+  short_description: "Independent high-effort critique in a fresh context"
+  default_prompt: "Use $rubber-duck-review to independently critique this plan or diff."
