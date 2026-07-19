@@ -1,0 +1,16 @@
+{
+  "name": "wedge-repro",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Reproduction harness for Foundry/Harvest deliverables 01 & 02 (proof, not assertion)",
+  "scripts": {
+    "verify:schema": "node wedge_schema_repro.mjs",
+    "verify:cel": "node cel_check.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.2",
+    "@marcbachmann/cel-js": "^7.6.1",
+    "cel-js": "^0.8.2"
+  }
+}

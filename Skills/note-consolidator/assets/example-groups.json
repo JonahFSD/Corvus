@@ -1,0 +1,14 @@
+{
+  "Objects": {
+    "intro": "The object model — the kinds of entities, their instances, identity, and how they are materialized from data.",
+    "members": ["Object Type", "Object", "Primary Key", "Object Backing", "Object Set"]
+  },
+  "Properties": {
+    "intro": "The typed attributes of objects — base types, reusable value types, derived and shared properties, and access controls.",
+    "members": ["Property", "Property Base Type", "Value Type", "Derived Property", "Shared Property", "Title Property", "Advanced Property Types", "Mandatory Control Property"]
+  },
+  "Links": {
+    "intro": "First-class, traversable relationships between object types — cardinality and link-carrying object types.",
+    "members": ["Link Type", "Link Cardinality", "Object-Backed Link"]
+  }
+}
