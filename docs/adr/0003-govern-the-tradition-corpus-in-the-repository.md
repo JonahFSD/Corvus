@@ -1,0 +1,3 @@
+# Govern the tradition corpus in the repository
+
+The version-controlled repository manifest is the system of record for source admission, editions, authority metadata, rationale, and corpus releases. It maps authority established by tradition-owned bodies and scholarly editorial processes; project maintainers verify provenance and operational fitness but do not confer theological authority. Gloo provides Publisher-scoped ingestion, retrieval, and citations but does not document the authority semantics this product requires, so each Gloo Publisher is a derived retrieval index populated only from a validated manifest; provider identifiers and ingestion state remain deployment mappings rather than theological provenance.

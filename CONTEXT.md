@@ -50,41 +50,85 @@ _Avoid_: Unanswerable question, controversial question
 An interpretation that applies an explicitly named theological tradition as a lens without presenting that lens as neutral or concealing significant disagreement. When no tradition is named, the Theological assistant does not silently select one. The Challenge submission guarantees first-class comparison across Catholic, Eastern Orthodox, Oriental Orthodox, and major Protestant families; narrower traditions are named only when explicit sources support them and their difference materially affects the answer.
 _Avoid_: Neutral theology, tradition setting
 
+**Major Protestant family**:
+One of the six Protestant families guaranteed first-class coverage in the Challenge submission: Anglican, Baptist, Lutheran, Pentecostal, Reformed/Presbyterian, or Wesleyan/Methodist. Anabaptist, Adventist, Restorationist, and independent Evangelical traditions may be added when a benchmark case demonstrates the need.
+_Avoid_: Protestantism, denomination
+
+**First-class tradition coverage**:
+A corpus guarantee that a tradition family has an authoritative Source spine and adequate Topic packs for every benchmarked question category. It is not comprehensive doctrinal coverage; an evidence gap requires disclosure and Evidentiary abstention from characterizing the affected tradition.
+_Avoid_: Comprehensive coverage, token representation
+
+**Tradition-relative authority**:
+A source's authority as claimed by a named tradition body, expressed through its source kind, recognizing body, recognition scope, tradition-namespaced status, and cited authority claim. Authorities from different traditions have no equivalence crosswalk or shared numeric rank.
+_Avoid_: Universal authority score, cross-tradition authority ranking
+
 **Explicit analysis scope**:
 Scope the user states in the question itself, such as a named tradition, canonical collection, translation, or historical period. The Theological assistant has no belief inference, user profile, hidden personalization, or default tradition setting. Without explicit scope it simply answers from shared textual ground and labels material disagreements; it asks a clarification only when the question itself is incomplete or genuinely cannot be answered responsibly as written.
 _Avoid_: Inferred beliefs, personalized theology, implicit tradition
 
 **Answer evidence package**:
-The structured result returned by the Bible Ontology MCP: relevant Scripture references and text, provenance, theological claims, interpretive positions, identified tensions, and provider-level completeness status. Gloo produces tradition-aware analysis inside this boundary; ChatGPT uses the package to present the final conversational answer. When an integration is unavailable, the package may be partial but must identify the gap and exclude or abstain from claims the missing evidence would materially affect.
+The citation-complete structured result returned by the Bible Ontology MCP, containing the answer content and evidence relationships needed to validate and present one answer. It identifies its Answer outcome and Evidence gaps and excludes or abstains from propositions materially affected by missing evidence. Its proposed schema is specified in ADR 0005 and does not become canonical domain language until fixture and contract validation accept that decision.
 _Avoid_: AI response, context blob
 
+**Citation**:
+A precise reference connecting a presented claim to an identifiable source, exact locator, edition or translation, and a resolvable user target when available. A Citation is neither the source's identity nor an opaque provider tool result.
+_Avoid_: Source link, bibliography entry
+
+**Evidence gap**:
+Missing, partial, empty, stale, unavailable, or rights-blocked evidence that names the affected answer content or interpretive positions and requires disclosure, qualification, or Evidentiary abstention. Provider availability alone does not determine whether an Evidence gap exists.
+_Avoid_: Provider error, completeness flag
+
+**Answer outcome**:
+The package-level classification Answered, Partially answered, or Abstained. It states whether the Answer evidence package is fit to present and leaves every limitation to a scoped Evidence gap rather than expressing theological truth as a numeric confidence score.
+_Avoid_: Confidence score, success flag
+
 **Tradition source**:
-An identifiable confessional, conciliar, catechetical, or scholarly source used to substantiate a claim about a theological tradition. Gloo may synthesize Tradition sources, but model memory alone is not provenance.
+An identifiable primary confessional, conciliar, catechetical, canonical, or liturgical source, or an approved secondary scholarly source, used to substantiate a claim about a theological tradition. A secondary source may explain context, diversity, reception, or disputed interpretation but cannot independently establish the tradition's stated position; Gloo may synthesize Tradition sources, but model memory alone is not provenance.
 _Avoid_: Tradition knowledge, model knowledge
 
 **Tradition corpus**:
 The versioned, curated collection of primary documents and explicitly approved scholarship from which Tradition sources may be cited. Gloo may synthesize, compare, and identify tensions within this corpus, but arbitrary live-web material and unverified model recollection are not admissible evidence for the Challenge submission.
 _Avoid_: Web search results, model bibliography
 
+**Approved scholarship**:
+A secondary Tradition source selected from an established scholarly editorial process only when a benchmark topic requires context, reception history, or explanation of internal diversity. It cannot independently establish a tradition's stated doctrine.
+_Avoid_: Gloo-approved source, model-recommended source
+
+**Source spine**:
+The small authority and discovery map of tradition-owned doctrinal anchors needed to represent every guaranteed tradition family. It is not a comprehensive historical library, and inclusion does not by itself authorize full-text runtime use.
+_Avoid_: Reading list, comprehensive theological library
+
+**Topic pack**:
+A benchmark-driven extension to the Source spine containing the primary sources, and only the necessary Approved scholarship, needed to compare traditions responsibly for one question category.
+_Avoid_: Topic bibliography, arbitrary document bundle
+
 **Pastoral handoff**:
-The Theological assistant's explicit redirection of a user toward qualified human clergy when a question calls for personal spiritual direction, sacramental judgment, crisis care, or an ongoing pastoral relationship. The assistant supports the handoff with relevant context but never presents itself as clergy.
+The Theological assistant's policy-controlled redirection of a user toward qualified human clergy when a question calls for personal spiritual direction, sacramental or ecclesial judgment, or an ongoing pastoral relationship. It is independent of whether the theological question was answered and is not itself a substantive theological claim; any such claim presented with it remains subject to ordinary evidence and citation requirements. Acute safety or crisis cases invoke a separate safety response and never rely on clergy as the sole emergency resource.
 _Avoid_: Pastoral advice, clergy disclaimer
 
 **Citation surface**:
-The Theological assistant's Palantir-style answer presentation in which every substantive scriptural or theological claim carries a tappable inline citation linked to the corresponding source or tool result. The same citations appear in a Sources dropdown beneath that message. Greetings, clarification questions, and purely conversational transitions do not require citations.
+The Theological assistant's Palantir-style answer presentation in which every substantive scriptural or theological claim carries a tappable inline evidence marker. The presentation distinguishes a source that directly supports the complete claim from evidence inherited through an auditable synthesis. The same source Citations appear in a Sources dropdown beneath that message. Greetings, clarification questions, and purely conversational transitions do not require citations.
 _Avoid_: Global bibliography, persistent sources sidebar
 
 **Evidence component**:
-The message-scoped Apps SDK component beneath an answer. It preserves the minimal Palantir-style Sources dropdown and provides an on-demand interactive graph of the analysis dependency path. Ordinary answers remain native ChatGPT prose without persistent application chrome or a permanently expanded dashboard.
+The message-scoped Apps SDK audit and exploration surface beneath the native ChatGPT answer. It preserves the minimal Palantir-style Sources dropdown plus an on-demand interactive graph of the analysis dependency path without competing with or replacing the conversational answer. The Answer evidence package remains the canonical answer data for both surfaces.
 _Avoid_: Persistent evidence dashboard, application shell
 
 **Evidence graph**:
-A Palantir-style interactive dependency graph showing the attributable flow from the user's question through MCP retrieval and analysis steps to cited answer statements. Users can inspect intermediate tool results and see how Scripture, Tradition, and lexical sources support, qualify, dispute, or inform named positions and conclusions. It exposes reproducible operations and evidence lineage, never private chain-of-thought or an undirected visualization of the entire Bible ontology.
+A Palantir-style interactive view derived from the Answer evidence package's canonical relationships, showing the attributable flow from the user's question through Material operations and Citations to presented answer claims. Users can inspect how Scripture, Tradition, and lexical sources contribute to conclusions without exposing unused exploratory work, private chain-of-thought, or an undirected visualization of the entire Bible ontology.
 _Avoid_: Hidden-reasoning transcript, ontology browser, knowledge-graph decoration
 
+**Material operation**:
+A retrieval or analysis operation that affects the answer by producing included evidence or by exposing a failure or empty result that requires disclosure, qualification, or Evidentiary abstention. Exploratory operations and rejected candidates that do not affect the answer are omitted from the Answer evidence package.
+_Avoid_: Tool log, reasoning step
+
 **Analysis branch**:
-A rerun created from a selected Evidence graph step after the user changes an explicit input such as tradition, canonical collection, translation, or search scope. It preserves the original answer and graph unchanged while producing a separately inspectable evidence path and conclusion.
+A rerun created from a selected replayable Evidence graph step after the user changes an explicit input such as tradition, canonical collection, translation, or search scope. It uses a short-lived integrity-protected Replay reference, preserves the original answer and graph unchanged, and produces a separately inspectable evidence path and conclusion without server-side conversation storage.
 _Avoid_: Edit answer, overwrite analysis
+
+**Replay reference**:
+A short-lived, bounded, integrity-protected, self-contained value emitted by the Bible Ontology MCP with the sanitized inputs and version identities needed to replay an eligible Material operation. It contains no credentials, raw provider exchanges, private chain-of-thought, or server-side conversation key.
+_Avoid_: Session ID, conversation record, workflow token
 
 **Original-language evidence**:
 Sourced Hebrew or Greek lexical and morphological data used only when it materially changes an answer. It must enter through the Bible ontology with provenance and be presented plainly rather than improvised from model memory.
@@ -95,7 +139,7 @@ A tradition-dependent set of scriptural books recognized as canon. The Bible ont
 _Avoid_: The canon, Bible version
 
 **Bible Ontology MCP**:
-The stateless evidence service invoked by the Theological assistant. It integrates the Bible ontology, YouVersion text retrieval, and Gloo analysis to return Answer evidence packages without retaining conversation history, inferred beliefs, or pastoral situations.
+The stateless MCP host invoked by the Theological assistant. It is a thin transport adapter around one cohesive Investigation module, initially deployed with that module as one executable process. It exposes only Theological investigation, Source inspection, and Analysis branch operations while keeping ontology access, YouVersion, Gloo, validation, credentials, and provider policy behind the seam.
 _Avoid_: App backend, theology API
 
 **Operational telemetry**:
@@ -106,12 +150,24 @@ _Avoid_: Conversation logs, theological analytics
 The primary deep MCP tool exposed to ChatGPT. Its sole user-authored input is the question as written; it does not accept or construct belief, tradition, or profile settings. It internally orchestrates Bible ontology traversal, licensed YouVersion text retrieval, and Gloo-powered structured analysis, then returns one citation-complete Answer evidence package. Explicit scope contained in the question is respected. Provider-level tools remain hidden behind this seam; separate narrow tools support source inspection and user-initiated Analysis branch reruns.
 _Avoid_: Provider tool chain, API orchestration prompt
 
+**Source inspection**:
+The narrow read-only MCP operation that resolves a package-emitted Citation reference into rights-permitted source identity, authority, edition, locator, excerpt, and safe external target details. It never accepts an arbitrary URL or exposes a provider search interface.
+_Avoid_: Web fetch, source search, provider passthrough
+
+**Investigation module**:
+The one cohesive runtime module behind the Bible Ontology MCP's three explicit operations: Theological investigation, Source inspection, and Analysis branch. Its top-level execution order is visible, its evidence-policy computations are pure where practical, and only dependencies with real live and fixture behavior receive adapters.
+_Avoid_: Workflow engine, provider framework, investigation microservices
+
+**Product runtime**:
+The strict TypeScript, ESM, npm-managed Node.js code that implements the Bible Ontology MCP, Investigation module, Corpus snapshot compiler, deterministic validators and fixtures, and React Evidence component. Python remains limited to pre-existing research or archival utilities and is not a production tier.
+_Avoid_: FastAPI tier, polyglot runtime, Python backend
+
 **Evidentiary abstention**:
 The required response when available evidence cannot support a confident answer. The Theological assistant states what is supported, exposes the unresolved gap or competing readings, and may ask a narrower follow-up instead of smoothing over uncertainty.
 _Avoid_: Refusal, fallback answer
 
 **Deterministic evidence gate**:
-The Challenge submission's release gate. Automated checks verify citation coverage, citation resolvability, claim-to-source linkage, Evidence graph integrity, provider-completeness reporting, graceful degradation, and required abstention behavior. Human clergy or scholar review is not part of the gate or runtime.
+The Challenge submission's release gate. Automated checks verify citation coverage, citation resolvability, claim-to-source linkage, Evidence graph integrity, Evidence-gap reporting, graceful degradation, and required abstention inside the Answer evidence package. The Developer Mode fidelity suite must also prove that native ChatGPT narration preserves the package's substantive propositions, citation bindings, Evidence gaps, Answer outcome, and Pastoral handoff. A failing fixture blocks release rather than switching authority to the component. Human clergy or scholar review is not part of the gate or runtime.
 _Avoid_: Clergy approval, human-in-the-loop answering
 
 **Faith-open posture**:

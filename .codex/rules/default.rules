@@ -48,3 +48,13 @@ prefix_rule(
         "gh issue close 12",
     ],
 )
+
+# Issue assignment is the one GitHub mutation agents must perform before a
+# Wayfinder session. The wrapper accepts exactly one numeric issue identifier
+# and can only add the current authenticated user as assignee.
+prefix_rule(
+    pattern = ["node", "scripts/claim-issue.mjs"],
+    decision = "allow",
+    justification = "Allow agents to claim one GitHub issue through the validated repository wrapper.",
+    match = ["node scripts/claim-issue.mjs 4"],
+)

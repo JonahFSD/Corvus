@@ -1,10 +1,12 @@
 # Bible Ontology + Semantic Layer — Build Spec v1
 
+> **Status: partially superseded.** ADR 0006 replaces the public eight-tool/provider-orchestration design with one stateless Investigation module exposed through `theological_investigation`, `inspect_source`, and `branch_analysis`. ADR 0007 replaces the FastAPI/Python production tier with the repository's strict TypeScript/Node.js Product runtime. The ontology concepts and data-model proposals below remain inputs to the pending storage decision; they are not implementation authority where they conflict with those ADRs or `CONTEXT.md`.
+
 **Goal:** a typed graph of everything in the Bible, wrapped in a semantic (ontology) layer, exposed to an LLM as tools. The LLM never touches SQL. It calls objects and links.
 
 **Stack decision (don't debate this):**
 - One database: **Postgres + pgvector**. Graph = two tables (`nodes`, `edges`) + recursive CTEs. No Neo4j. No second DB.
-- **Semantic layer** = a FastAPI service with ~8 typed endpoints. This is the whole product.
+- **Semantic layer** = superseded by the TypeScript Investigation module and three MCP operations in ADRs 0006 and 0007.
 - **Text is never stored.** Bible text is fetched at runtime from YouVersion. Graph stores USFM refs only.
 - LLM = Gloo AI (values-aligned, OpenAI-compatible, has a `tradition` param).
 
@@ -131,9 +133,9 @@ Steps 1–5 are downloads and a parser. You get ~80% of the graph in a weekend.
 
 ---
 
-## 6. Semantic Layer API (= the MCP tools the AI gets)
+## 6. Historical Semantic Layer API (superseded)
 
-Eight verbs. The model gets these, nothing else.
+These eight verbs are retained as historical internal retrieval ideas. They are not public MCP tools; ADR 0006 defines the three public operations.
 
 ```
 resolve(text)            → node ids  ("the guy who denied Jesus" → PER:PETER)
@@ -196,7 +198,7 @@ Step 4 is why this beats plain RAG. Vector search finds *similar wording*. Graph
 
 ## 9. ChatGPT App layer
 
-Ship the semantic layer as an **MCP server**. The 8 tools above become the app's toolset.
+Ship the Investigation module through the **MCP server**. ADR 0006 defines the app's three-tool surface; the eight verbs above do not become public tools.
 
 UI components worth building:
 - **Verse card** — text + translation switcher + the edges that made it show up
