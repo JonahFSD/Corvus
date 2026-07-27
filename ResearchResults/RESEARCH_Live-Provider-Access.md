@@ -106,3 +106,7 @@ Primary references: [Gloo developer quickstart](https://docs.gloo.com/getting-st
 5. Default to no persistent Scripture-text caching until the selected version policy proves it is allowed.
 6. Preserve provider request identifiers in content-free operational telemetry where available.
 7. Verify challenge credit and production limits before load testing or public launch.
+
+## Applied Scripture-display decision
+
+ADR 0011 records YouVersion version 206, _World English Bible, American English Edition, without Strong's Numbers_ (`engWEBUS`), as the operational Scripture display default when the user names no translation. The live version metadata marks it public domain and exposes 81 books, the broadest inventory among the eleven enabled English editions. This does not define any tradition's Canonical collection, and it still does not cover every broader Oriental Orthodox collection. Runtime text remains server-transient, every displayed excerpt carries exact edition and attribution metadata, and missing or explicitly unavailable editions fail visibly rather than triggering a silent fallback.

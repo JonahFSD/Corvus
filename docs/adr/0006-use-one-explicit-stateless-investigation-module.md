@@ -68,6 +68,8 @@ The server retains no conversation, Answer evidence package, user profile, infer
 
 `branchAnalysis` accepts a user-authored Scope delta separately, verifies that the selected operation has a replayable receipt chain, and returns a new immutable package linked to its parent. Expired, oversized, tampered, non-replayable, or no-longer-admissible references fail closed. The original package remains valid and unchanged when inspection or branching is unavailable.
 
+`CitationReference` has a seven-day lifetime and `ReplayReference` has a 24-hour lifetime, with at most five minutes of server clock skew. Encoded expiries beyond those hard maxima are invalid. Retired releases, required Corpus artifacts and locator metadata, replay contracts, and verification keys remain available through every possibly unexpired reference as specified by Implementation readiness. Current rights revocation and denylist policy still fail closed even inside the nominal lifetime.
+
 ### Failure and performance behavior
 
 Expected provider timeouts, rate limits, empty results, missing Topic packs, and rights restrictions become provider reports and scoped Evidence gaps inside a valid Answered, Partially answered, or Abstained package whenever a truthful package can still be constructed. Tool-level errors are reserved for malformed input, invalid references, unsupported schema versions, unsafe requests, or infrastructure failure that prevents even an abstaining package.

@@ -55,7 +55,7 @@ One of the six Protestant families guaranteed first-class coverage in the Challe
 _Avoid_: Protestantism, denomination
 
 **First-class tradition coverage**:
-A corpus guarantee that a tradition family has an authoritative Source spine and adequate Topic packs for every benchmarked question category. It is not comprehensive doctrinal coverage; an evidence gap requires disclosure and Evidentiary abstention from characterizing the affected tradition.
+A production-release guarantee that a tradition family has a runtime-admissible authoritative Source spine and adequate Topic packs for every benchmarked question category. Every required benchmark Position membership must have sufficient primary evidence whose exact edition, recognizing-body scope, rights, and delivery mode pass the Corpus-snapshot compiler. It is not comprehensive doctrinal coverage; outside the guaranteed benchmark envelope, an Evidence gap requires disclosure and Evidentiary abstention from characterizing the affected tradition.
 _Avoid_: Comprehensive coverage, token representation
 
 **Tradition-relative authority**:
@@ -90,6 +90,10 @@ _Avoid_: Tradition knowledge, model knowledge
 The versioned, curated collection of primary documents and explicitly approved scholarship from which Tradition sources may be cited. Gloo may synthesize, compare, and identify tensions within this corpus, but arbitrary live-web material and unverified model recollection are not admissible evidence for the Challenge submission.
 _Avoid_: Web search results, model bibliography
 
+**Runtime-admissible source**:
+An exact source artifact whose identity, edition, authority scope, locators, provenance, quality, and permitted uses have passed human rights review and deterministic Corpus-snapshot validation for the operation being performed. Public readability and `reference_only` metadata are not runtime admissibility; storage, transformations, provider processing, model input, excerpts, Citation targets, caching, embeddings, and embedded third-party material are authorized separately where applicable.
+_Avoid_: Public source, available content, fair-use corpus
+
 **Approved scholarship**:
 A secondary Tradition source selected from an established scholarly editorial process only when a benchmark topic requires context, reception history, or explanation of internal diversity. It cannot independently establish a tradition's stated doctrine.
 _Avoid_: Gloo-approved source, model-recommended source
@@ -111,7 +115,7 @@ The Theological assistant's Palantir-style answer presentation in which every su
 _Avoid_: Global bibliography, persistent sources sidebar
 
 **Evidence component**:
-The message-scoped Apps SDK audit and exploration surface beneath the native ChatGPT answer. It preserves the minimal Palantir-style Sources dropdown plus an on-demand interactive graph of the analysis dependency path without competing with or replacing the conversational answer. The Answer evidence package remains the canonical answer data for both surfaces.
+The message-scoped Apps SDK audit and exploration surface beneath the native ChatGPT answer. It preserves the minimal Palantir-style Sources dropdown plus an on-demand interactive graph of the analysis dependency path. Ordinary mode keeps it subordinate to native narration. In the explicitly labeled narration-safe mode, it becomes the sole substantive presentation of the unchanged canonical package while model-visible tool text is non-substantive; if ChatGPT cannot preserve that boundary, the tool fails closed. The Answer evidence package remains the canonical answer data for both surfaces.
 _Avoid_: Persistent evidence dashboard, application shell
 
 **Evidence graph**:
@@ -127,16 +131,36 @@ A rerun created from a selected replayable Evidence graph step after the user ch
 _Avoid_: Edit answer, overwrite analysis
 
 **Replay reference**:
-A short-lived, bounded, integrity-protected, self-contained value emitted by the Bible Ontology MCP with the sanitized inputs and version identities needed to replay an eligible Material operation. It contains no credentials, raw provider exchanges, private chain-of-thought, or server-side conversation key.
+A 24-hour, bounded, integrity-protected, self-contained value emitted by the Bible Ontology MCP with the sanitized inputs and version identities needed to replay an eligible Material operation. It contains no credentials, raw provider exchanges, private chain-of-thought, or server-side conversation key.
 _Avoid_: Session ID, conversation record, workflow token
 
 **Original-language evidence**:
 Sourced Hebrew or Greek lexical and morphological data used only when it materially changes an answer. It must enter through the Bible ontology with provenance and be presented plainly rather than improvised from model memory.
 _Avoid_: Word-study insight, original-language color
 
+**Bible ontology**:
+The versioned typed evidence and discovery index used by the Investigation module. It records deterministic scriptural structure and source-attributed, tradition-scoped interpretive relationships while keeping algorithmic or model-proposed Discovery candidates quarantined from admissible evidence. It indexes sources and references; it does not declare universal theological truth.
+_Avoid_: Theology knowledge graph, truth graph, model memory store
+
+**Ontology release**:
+An immutable, content-digested publication of Bible ontology entities, deterministic structure, source-scoped interpretation, Discovery candidates, and rights-permitted embeddings. Runtime queries pin exactly one release; corrections create a new semantic version rather than mutating released records.
+_Avoid_: Live graph, mutable knowledge base, database state
+
+**Corpus snapshot**:
+The immutable, content-digested runtime artifact compiled from one released Tradition-corpus manifest. It preserves admitted source, edition, authority, provenance, rights, and corpus-membership policy while provider deployment mappings remain separate.
+_Avoid_: Gloo Publisher, live bibliography, corpus database
+
+**Discovery candidate**:
+An algorithmic or model-proposed association used only to widen or rank retrieval. It retains origin, version, and operational scoring but cannot authorize an Answer statement, satisfy an Answer obligation, establish a tradition position, or appear as evidence in the Evidence graph.
+_Avoid_: Low-confidence evidence, provisional doctrine, ontology fact
+
 **Canonical collection**:
 A tradition-dependent set of scriptural books recognized as canon. The Bible ontology records collection membership explicitly; availability of licensed display text does not determine canonical status.
 _Avoid_: The canon, Bible version
+
+**Scripture display edition**:
+The exact YouVersion edition used to hydrate and render a cited passage after Canonical collection and Scripture references have already been selected. An explicit user request takes precedence; otherwise Corvus records World English Bible US, YouVersion version 206, as its operational display default. Edition availability never determines canon or interpretive authority, and missing or translation-sensitive text remains visible as an Evidence gap or requires additional evidence.
+_Avoid_: Default Bible, preferred translation, canonical version
 
 **Bible Ontology MCP**:
 The stateless MCP host invoked by the Theological assistant. It is a thin transport adapter around one cohesive Investigation module, initially deployed with that module as one executable process. It exposes only Theological investigation, Source inspection, and Analysis branch operations while keeping ontology access, YouVersion, Gloo, validation, credentials, and provider policy behind the seam.
@@ -161,6 +185,10 @@ _Avoid_: Workflow engine, provider framework, investigation microservices
 **Product runtime**:
 The strict TypeScript, ESM, npm-managed Node.js code that implements the Bible Ontology MCP, Investigation module, Corpus snapshot compiler, deterministic validators and fixtures, and React Evidence component. Python remains limited to pre-existing research or archival utilities and is not a production tier.
 _Avoid_: FastAPI tier, polyglot runtime, Python backend
+
+**Gloo analysis**:
+The Investigation module's use of Gloo as two private capabilities: publisher-scoped semantic retrieval over a deployment derived from one pinned Corpus snapshot, followed by schema-constrained analysis of evidence that Corvus has independently resolved and admitted. Corvus does not use Gloo's shared grounded corpus, coarse `tradition` categories, provider citations, auto-routing, or ungrounded model memory as evidence; all provider output remains candidate data until it passes deterministic validation.
+_Avoid_: Gloo theology, values alignment, model authority
 
 **Evidentiary abstention**:
 The required response when available evidence cannot support a confident answer. The Theological assistant states what is supported, exposes the unresolved gap or competing readings, and may ask a narrower follow-up instead of smoothing over uncertainty.

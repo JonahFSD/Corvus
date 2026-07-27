@@ -1,231 +1,167 @@
-# Bible Ontology + Semantic Layer — Build Spec v1
+# Bible ontology implementation brief
 
-> **Status: partially superseded.** ADR 0006 replaces the public eight-tool/provider-orchestration design with one stateless Investigation module exposed through `theological_investigation`, `inspect_source`, and `branch_analysis`. ADR 0007 replaces the FastAPI/Python production tier with the repository's strict TypeScript/Node.js Product runtime. The ontology concepts and data-model proposals below remain inputs to the pending storage decision; they are not implementation authority where they conflict with those ADRs or `CONTEXT.md`.
+Status: current implementation authority.
 
-**Goal:** a typed graph of everything in the Bible, wrapped in a semantic (ontology) layer, exposed to an LLM as tools. The LLM never touches SQL. It calls objects and links.
+This brief defines the stable role of the Bible ontology inside Corvus. Detailed
+product behavior belongs to the Theological assistant specification, exact
+runtime envelopes belong to Implementation readiness, and architectural choices
+belong to the accepted ADRs. Historical PostgreSQL, generic graph, eight-tool,
+FastAPI, and Render designs remain available in Git history but are not
+implementation inputs.
 
-**Stack decision (don't debate this):**
-- One database: **Postgres + pgvector**. Graph = two tables (`nodes`, `edges`) + recursive CTEs. No Neo4j. No second DB.
-- **Semantic layer** = superseded by the TypeScript Investigation module and three MCP operations in ADRs 0006 and 0007.
-- **Text is never stored.** Bible text is fetched at runtime from YouVersion. Graph stores USFM refs only.
-- LLM = Gloo AI (values-aligned, OpenAI-compatible, has a `tradition` param).
+## Authority
 
----
+Read these records together, in this order:
 
-## 1. The one architectural rule
+1. `AGENTS.md` and `CONTEXT.md` for repository rules and canonical language;
+2. `docs/theological-assistant-spec.md` for product behavior and testing seams;
+3. ADRs 0005 through 0013 for evidence, module, runtime, ontology, storage,
+   provider, rights, and deployment decisions;
+4. `docs/implementation-readiness.md` for phase gates and numerical envelopes;
+5. the claimed GitHub issue for the bounded vertical slice being implemented.
 
-> **The graph stores references, not scripture.**
+When a historical research or Harvest artifact conflicts with those records,
+the current records above win. A new conflicting requirement needs an explicit
+superseding decision; implementation may not silently choose between them.
 
-Node/edge IDs are USFM verse refs (`JHN.3.16`, `GEN.1.1`). That's YouVersion's own ID scheme, so the join is free, it's translation-agnostic, and you sidestep Bible licensing entirely. You are building an index, not a copy.
+## Product boundary
 
-```
-User → ChatGPT App → Semantic Layer (MCP tools)
-                          ├─→ Postgres (ontology: nodes, edges, vectors)
-                          ├─→ YouVersion API (verse text, on demand)
-                          └─→ Gloo AI (reasoning + tradition alignment)
-```
+Corvus is an invokable ChatGPT app, not a standalone chat client. One cohesive,
+stateless Investigation module sits behind a thin Apps SDK and MCP adapter. The
+public Streamable HTTP MCP advertises exactly three read-only tools:
 
----
+- `theological_investigation`, whose only user-authored top-level input is the
+  question as written;
+- `inspect_source`, which accepts only a signed package-issued Citation
+  reference; and
+- `branch_analysis`, which accepts a signed package-issued Replay reference and
+  an explicit user-authored Scope delta.
 
-## 2. Ontology — Object Types
+YouVersion, Gloo, ontology storage, corpus policy, validation, credentials,
+publication, and provider failures remain private implementation details. There
+is no public provider passthrough, arbitrary URL fetch, ontology administration,
+release publication, general graph query, or direct browser-to-Convex surface.
 
-Palantir-shaped: Object Types, Link Types, Action Types.
+## Ontology role
 
-| Type | Key | Notes |
-|---|---|---|
-| `Verse` | USFM `JHN.3.16` | atomic unit. Everything anchors here. |
-| `Pericope` | `PER:...` | named passage span (Sermon on the Mount) |
-| `Book`, `Chapter` | USFM | structural |
-| `Person` | `PER:MOSES` | incl. divine persons, flagged |
-| `Place` | `PLC:JERUSALEM` | lat/lng where known |
-| `Group` | `GRP:PHARISEES` | nations, tribes, sects |
-| `Event` | `EVT:EXODUS` | has fuzzy time bounds |
-| `Object` | `OBJ:ARK_COVENANT` | physical things |
-| `Theme` | `THM:GRACE` | abstract concept |
-| `Claim` | `CLM:...` | a proposition asserted by a text |
-| `Motif` | `MTF:LAMB` | symbol/image, drives typology |
-| `Covenant` | `CVN:ABRAHAMIC` | |
-| `Genre` | `GEN:APOCALYPTIC` | reading-mode hint for the AI |
-| `Era` | `ERA:EXILE` | |
+The Bible ontology is an immutable, versioned evidence and discovery index. It
+helps the Investigation module resolve identity, traverse attributable
+relationships, and discover candidate evidence. It does not declare universal
+theological truth.
 
-Every node: `{id, type, label, aliases[], props jsonb, embedding vector(1536)}`
+Every ontology record has one explicit policy class:
 
----
+1. **Deterministic structure** records source-verifiable identity, containment,
+   canonical-collection membership, passage locators, and admitted lexical or
+   morphological identifiers.
+2. **Source-scoped interpretation** records what one admitted Source asserts,
+   with exact Artifact, locator, edition, recognizing body, tradition and
+   authority scope, Corpus snapshot, and relationship type.
+3. **Discovery candidate** records an algorithmic or model-proposed association
+   used only to widen or rank retrieval. It cannot authorize an Answer
+   statement, satisfy an obligation, establish a Position, repair an Evidence
+   gap, or appear as evidence in the Evidence graph.
 
-## 3. Ontology — Link Types (the actual value)
+Interpretive relationships such as fulfillment, typology, doctrinal relevance,
+or tension are never universal merely because a model, embedding, cross-reference
+vote, or maintainer proposed them. They require an admitted source-scoped
+assertion or remain package-local Derived statements with validated lineage.
+Similarity and ranking scores are operational metadata, never authority,
+sufficiency, Answer outcome, or user-visible theological confidence.
 
-Directional, typed, **and every edge carries metadata**:
+## Releases and storage
 
-```json
-{
-  "src": "MAT.2.15", "rel": "FULFILLS", "dst": "HOS.11.1",
-  "confidence": 0.98,
-  "source": "explicit_citation",     // explicit_citation | scholarly | algorithmic | llm_proposed | user
-  "traditions": ["catholic","reformed","orthodox","evangelical"],
-  "evidence": ["MAT.2.15"],
-  "notes": "Matthew cites directly"
-}
-```
+Convex is the sole production application database and vector facility. The
+runtime uses release-prefixed typed records rather than generic nodes and edges.
+Every runtime read pins one complete immutable Ontology release and Corpus
+snapshot; lower-level code never infers `latest`.
 
-**Link types:**
+Publication is an offline, CI-only stage, seal, validate, and atomic activate
+workflow. The Vercel runtime can read approved projections but cannot stage,
+publish, mutate, retire, or prune releases. Vercel rollback and Convex active-pin
+rollback are separate, compatibility-checked operations.
 
-*Textual*
-`QUOTES`, `ALLUDES_TO`, `PARALLEL_TO` (synoptics), `VARIANT_OF`
+Traversal is deterministic, indexed, release-pinned, cycle-safe, and bounded by
+the envelope in Implementation readiness. Budget exhaustion creates a typed Gap
+or abstaining result; it never silently truncates required evidence. Vector
+search is optional and quarantined to Discovery candidates whose exact Artifacts
+permit durable derived indexing.
 
-*Theological*
-`FULFILLS` / `PROPHESIES`, `TYPE_OF` (typology: Isaac → Christ), `ELABORATES`, `TENSION_WITH` ⭐
+Do not add PostgreSQL, pgvector, Neo4j, a shadow store, a second vector service,
+or a browser-accessible Convex data path without production benchmark evidence
+and a superseding ADR.
 
-*Narrative*
-`PRECEDES`, `CAUSES`, `PARTICIPATES_IN`, `LOCATED_AT`, `SPEAKS`, `ADDRESSED_TO`, `DESCENDANT_OF`
+## Evidence contract
 
-*Semantic*
-`MENTIONS` (verse → entity, w/ char offsets), `ABOUT` (verse → theme, weighted), `INSTANCE_OF` (verse → claim), `SPEECH_ACT` (command / promise / warning / question / lament)
+The Answer evidence package is the canonical substantive result. It contains
+ordered atomic Answer statements, Citations, statement-owned Evidence links,
+Derived-statement lineage, Analysis scope, Answer obligations and outcome,
+Position memberships, Evidence gaps, provider reports, Material-operation
+receipts, semantic structure links, and exact release pins.
 
-⭐ **`TENSION_WITH` is the differentiator.** Faith + works. Predestination + free will. Most Bible AI flattens hard passages into mush. Yours surfaces the tension *as a first-class edge* and answers: "these two texts pull against each other; here's how each tradition resolves it." That's the honest answer, and it maps directly onto Gloo's `tradition` parameter.
+Every substantive statement is either source-grounded through admissible exact
+evidence or Derived through an acyclic lineage terminating in supported
+source-grounded statements. A Citation identifies one exact Artifact, locator,
+edition, content mode, delivered excerpt, and safe target when permitted. Reusing
+a Citation never transfers authority, tradition scope, or support between
+statements.
 
----
+Sources and the Evidence graph are derived from canonical package relationships;
+they are not duplicate answer models. Operation receipts expose material inputs,
+outputs, failures, and replayability without recording private chain-of-thought,
+credentials, raw provider exchanges, or conversation state.
 
-## 4. Schema (literally this)
+## Content and rights
 
-```sql
-CREATE TABLE nodes (
-  id TEXT PRIMARY KEY,
-  type TEXT NOT NULL,
-  label TEXT NOT NULL,
-  aliases TEXT[],
-  props JSONB DEFAULT '{}',
-  embedding vector(1536)
-);
+The repository-governed Corpus snapshot owns source identity, tradition-relative
+authority, exact edition, provenance, membership, and rights decisions. Only
+`included` or explicitly authorized immutable `fetch_only` Artifacts may support
+substantive statements. Public readability, metadata, a provider result, or a
+checksum of a mutable page does not make content runtime-admissible.
 
-CREATE TABLE edges (
-  id BIGSERIAL PRIMARY KEY,
-  src TEXT REFERENCES nodes(id),
-  rel TEXT NOT NULL,
-  dst TEXT REFERENCES nodes(id),
-  confidence REAL DEFAULT 0.5,
-  source TEXT NOT NULL,
-  traditions TEXT[],
-  evidence TEXT[],
-  props JSONB DEFAULT '{}'
-);
+Canonical collection is independent from Scripture display edition. YouVersion
+hydrates bounded Scripture only after locator selection. Passage text is never
+persisted in Convex, Gloo, logs, telemetry, durable caches, or Replay references.
+Gloo performs publisher-scoped retrieval and then schema-constrained analysis;
+its output remains untrusted candidate data until deterministic validation.
 
-CREATE INDEX ON edges (src, rel);
-CREATE INDEX ON edges (dst, rel);
-CREATE INDEX ON nodes USING hnsw (embedding vector_cosine_ops);
-```
+## First fixture
 
-That's it. Two tables. Traversal = recursive CTE.
+The first implementation fixture asks:
 
----
+> According to Matthew 22:37–40, which commandments does Jesus call greatest?
 
-## 5. Where the data comes from (don't hand-build 31,102 verses)
+It uses reviewed public-domain World English Bible US fixture text and exact
+locators for Matthew 22:37–38 and Matthew 22:39–40. It is factually bounded to
+what the cited passage says and requires no tradition-bearing default or
+benchmark Position plan. The fixture must exercise at least:
 
-Seed order, all public domain or open-licensed:
+- preservation of the question as written;
+- one requested Answer obligation;
+- two atomic Textual observations with direct Scripture Evidence links;
+- one derived Conclusion with explicit lineage to both observations;
+- exact Source, Artifact, edition, locator, content mode, and Citation identity;
+- one deterministic fixture Operation receipt and complete output links;
+- an `Answered` outcome derived from the supported obligation;
+- Sources and minimal Evidence-graph projections derived from package links; and
+- deterministic successful, degraded, abstaining, and hostile-data variants.
 
-1. **OpenBible.info cross-references** (CC-BY) — ~340k weighted verse links. Instant `ALLUDES_TO` / `PARALLEL_TO` backbone with a built-in vote score → your `confidence`.
-2. **STEP Bible / Tyndale open data** — tagged people, places, Strong's numbers per verse. Gives `MENTIONS` for free.
-3. **Nave's Topical Bible** (PD) — verse → `Theme` edges.
-4. **Eusebian Canons** (PD) — gospel `PARALLEL_TO` links, ancient and accurate.
-5. **NT-quotes-OT tables** (PD) — ~340 explicit `QUOTES` edges, confidence 1.0.
-6. **LLM extraction pass** over a PD text (BSB/KJV) for `SPEECH_ACT`, `CLAIM`, `TENSION_WITH`, `TYPE_OF`. Tag `source: llm_proposed`, cap confidence at 0.6, and never let those alone drive an answer.
+The unscoped baptism comparison remains the maximum contested stress fixture. It
+cannot become a supported fixture until Issue #8 checks in and accepts the
+versioned benchmark category and material-Position plan.
 
-Steps 1–5 are downloads and a parser. You get ~80% of the graph in a weekend.
+## Implementation sequence
 
----
+1. Validate the minimal package, pure evidence policy, factual fixture, in-memory
+   read store, MCP harness, and minimal Evidence component.
+2. Add explicit missing-plan behavior without inventing contested plans.
+3. Prove fixture-backed Vercel transport and the Vercel-to-Convex trust boundary.
+4. Implement live Convex storage only after every trust-spike case passes.
+5. Enable live providers only after contract, rights, caller-gate, redaction,
+   budget, and spend proofs pass.
+6. Support unscoped contested planning only after Issue #8 is accepted.
+7. Assemble production only after rights, narration, security, load, rollback,
+   restore, and human release gates pass.
 
-## 6. Historical Semantic Layer API (superseded)
-
-These eight verbs are retained as historical internal retrieval ideas. They are not public MCP tools; ADR 0006 defines the three public operations.
-
-```
-resolve(text)            → node ids  ("the guy who denied Jesus" → PER:PETER)
-get_text(refs[], version)→ verse text via YouVersion
-neighbors(id, rels[], k) → typed 1-hop expansion
-path(a, b, max_hops)     → how are these connected? returns explained chain
-theme_search(query, k)   → hybrid: vector seed + graph expansion
-cross_refs(ref)          → ranked cross-references w/ reason for each
-tensions(topic)          → passages in TENSION_WITH + per-tradition resolutions
-timeline(entity)         → ordered events for a person/era
-```
-
-**Why a semantic layer instead of letting the LLM write Cypher/SQL:**
-1. It can't invent a verse that doesn't exist — refs are validated against `nodes`.
-2. Every response carries `provenance[]`, so the UI can render real citations.
-3. You can change the DB without retraining/re-prompting anything.
-4. Ontology is a contract: one schema file generates the TS types, the tool JSON schemas, and the DB DDL.
-
-**Every tool returns the same envelope:**
-```json
-{ "results": [...], "provenance": [{"edge_id":..,"source":..,"confidence":..}],
-  "contested": bool, "refs": ["JHN.3.16"] }
-```
-
----
-
-## 7. Query pipeline (the "smart answer" loop)
-
-```
-1. INTENT   Gloo model + ontology schema in prompt → {entities, link_types, intent}
-2. RESOLVE  entities → node ids
-3. SEED     pgvector top-k verses
-4. EXPAND   k-hop along ONLY the link types the intent needs (2 hops max)
-5. RANK     score = 0.5·cosine + 0.3·edge_confidence − 0.2·hop_penalty
-6. HYDRATE  YouVersion GET /v1/bibles/{id}/passages/{usfm} for top ~12 refs
-7. ANSWER   Gloo grounded completion, tradition param set, citations required
-8. FLAG     if any edge has contested traditions → render "traditions differ" panel
-```
-
-Step 4 is why this beats plain RAG. Vector search finds *similar wording*. Graph expansion finds *theologically connected* passages that share no vocabulary at all — Genesis 22 to John 19, "lamb" to "Passover" to "crucifixion." No embedding model gets you that hop.
-
----
-
-## 8. External APIs
-
-**YouVersion Platform** — `https://api.youversion.com/v1/`
-- Auth: `X-YVP-App-Key` header. Register at platform.youversion.com.
-- `GET /v1/bibles/{version_id}/passages/{USFM}` → text
-- `GET /v1/bibles` → available versions (after accepting license agreements)
-- Pagination: `page_size` + `next_page_token`
-- ⚠️ **Non-commercial terms.** Fine for a competition. Wrap it in a `BibleProvider` interface on day one anyway.
-- ⚠️ Cache aggressively; never block a page render on it — 404 and hide the component on failure.
-
-**Gloo AI** — `docs.gloo.com`
-- OpenAI-compatible Responses / Completions APIs.
-- `tradition` parameter for theological perspective — wire this straight to the `traditions[]` field on your edges. This is the single tightest integration point in the whole design.
-- Search API / Data Engine if you want to ground on commentary content you upload.
-
----
-
-## 9. ChatGPT App layer
-
-Ship the Investigation module through the **MCP server**. ADR 0006 defines the app's three-tool surface; the eight verbs above do not become public tools.
-
-UI components worth building:
-- **Verse card** — text + translation switcher + the edges that made it show up
-- **Graph mini-map** — the 2-hop subgraph that produced the answer (shows your work; this is the demo shot)
-- **Tension panel** — side-by-side passages with per-tradition takes
-- **Trace path** — "Passover lamb → John 1:29" rendered as an explained chain
-
----
-
-## 10. Build order
-
-| Day | Deliverable |
-|---|---|
-| 1 | Postgres + schema. Load 31,102 verse nodes from USFM index. |
-| 2 | Parse OpenBible cross-refs + STEP tags → ~400k edges. |
-| 3 | Embed all verses (batch, one pass). HNSW index. |
-| 4 | Semantic layer: `resolve`, `get_text`, `neighbors`, `path`. |
-| 5 | Query pipeline + Gloo grounded call. YouVersion hydration. |
-| 6 | LLM extraction pass for `TENSION_WITH` + `TYPE_OF` on ~500 key passages. |
-| 7 | MCP wrapper + UI components + demo. |
-
----
-
-## 11. Non-negotiables
-
-1. Never store Bible text. Refs only.
-2. Every edge has `confidence` + `source`. No unattributed assertions.
-3. Contested theology renders as contested — never as a single confident answer.
-4. LLM proposals enter the graph quarantined (`source: llm_proposed`, conf ≤ 0.6).
-5. No answer ships without verse refs the user can tap through to YouVersion.
+Every slice runs the relevant focused suites, then `npm run check`, then separate
+Standards and Spec reviews from a pinned base revision.

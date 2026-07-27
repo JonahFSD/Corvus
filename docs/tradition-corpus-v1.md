@@ -46,9 +46,18 @@ Each admitted source carries these nested fields in one record. A field may beco
 - Canonical source URL, retrieval URL and date, content type, and checksum.
 - Rights holder, license or terms URL, attribution requirements, and permitted content mode.
 - Content mode: `included`, `fetch_only`, `reference_only`, or `blocked`.
+- Immutable artifact version or revision, content checksum, versioned retrieval locator, and guaranteed availability window when content mode is `fetch_only`.
 - Text or transcription quality, validation result, known omissions, and transformation history.
 
-Only `included` and explicitly permitted `fetch_only` artifacts may support substantive claims. `reference_only` retains metadata and an outbound link; `blocked` cannot be used. Public availability is not permission. A validated public-domain English edition may be used when its wording is adequate, but it cannot support claims dependent on later revisions or materially uncertain translation.
+Only `included` and explicitly permitted, immutable `fetch_only` artifacts may support substantive claims. A first-class or replayable `fetch_only` artifact must have a versioned locator whose bytes are guaranteed stable through the seven-day Citation lifetime and 24-hour Replay lifetime, plus five minutes of clock skew after last issuance, an expected checksum verified on every fetch, and terms permitting every runtime use. A checksum of a mutable page is only a change detector: it does not make the page replayable. If exact bytes cannot be re-fetched for the required window, the artifact is `reference_only` for first-class evidence even when its current page is public or citable. `reference_only` retains metadata and a permitted outbound link; `blocked` cannot be used. Public availability is not permission. A validated public-domain English edition may be used when its wording is adequate, but it cannot support claims dependent on later revisions or materially uncertain translation.
+
+## Rights-clearance release gate
+
+ADR 0012 makes Runtime-admissible source coverage a hard production-release gate. Every guaranteed tradition family and every mandatory benchmark Position membership must have sufficient primary evidence in `included` or explicitly authorized, immutable `fetch_only` mode. `reference_only` sources do not count toward evidentiary coverage and their prose cannot enter Gloo, model input, excerpts, Citations, or the Evidence component.
+
+Permission review covers the exact edition and artifact, acquisition and storage, transformations and chunking, provider/model processing, bounded delivery to each answer surface, links, caching, embeddings, attribution, embedded third-party material, territories, term, revocation, and deletion. Public-domain review applies to the exact translation, transcription, and acquired bytes rather than only the underlying work. The Corpus-snapshot compiler emits a coverage report and fails production publication when any guaranteed family or mandatory benchmark position depends on unavailable, expired, revoked, ambiguous, or unreviewed rights.
+
+Fixture-first implementation continues with synthetic test sources and reviewed public-domain artifacts. Production remains blocked until the permission/acquisition workstream closes the artifact gaps recorded in [Tradition Corpus Artifact Rights](../ResearchResults/RESEARCH_Tradition-Corpus-Artifact-Rights.md).
 
 ### Corpus membership
 
@@ -69,4 +78,4 @@ Released manifests are immutable. Patch versions correct non-semantic metadata, 
 
 ## Prior art and open work
 
-The evidence and candidate-source analysis are in [Tradition Corpus Prior Art](../ResearchResults/RESEARCH_Tradition-Corpus-Prior-Art.md). The remaining work is operational: choose and clear exact English artifacts, validate citation anchors and textual quality, and populate the manifest during Issue #12. Rights clearance—especially for modern Vatican, WCC, denominational, and scholarly editions—is the principal release risk.
+The authority and candidate-source analysis is in [Tradition Corpus Prior Art](../ResearchResults/RESEARCH_Tradition-Corpus-Prior-Art.md); the exact-edition and rights audit is in [Tradition Corpus Artifact Rights](../ResearchResults/RESEARCH_Tradition-Corpus-Artifact-Rights.md). The remaining work is operational but release-blocking: obtain permission or independently licensed exact English artifacts, validate citation anchors and textual quality, and populate the manifest during Issue #12. Rights clearance—especially for modern Catholic, Orthodox, Anglican, Baptist, Pentecostal, Reformed, Methodist, ecumenical, and scholarly editions—is a mandatory release workstream rather than a risk accepted at launch.
