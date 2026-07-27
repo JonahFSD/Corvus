@@ -30,42 +30,46 @@ function loadNativeParents(issueNumbers, cwd) {
     cwd
   );
   const [owner, name] = nameWithOwner.split("/");
-  const fields = issueNumbers
-    .map(
-      (number) =>
-        `i${number}: issue(number: ${number}) { parent { number labels(first: 20) { nodes { name } } } }`
-    )
-    .join("\n");
-  const query = `query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ${fields} } }`;
-  const response = ghJson(
-    [
-      "api",
-      "graphql",
-      "-f",
-      `query=${query}`,
-      "-F",
-      `owner=${owner}`,
-      "-F",
-      `name=${name}`,
-    ],
-    cwd
-  );
-  const repository = response.data?.repository ?? {};
+  const parents = new Map();
+  for (let offset = 0; offset < issueNumbers.length; offset += 50) {
+    const batch = issueNumbers.slice(offset, offset + 50);
+    const fields = batch
+      .map(
+        (number) =>
+          `i${number}: issue(number: ${number}) { parent { number labels(first: 20) { nodes { name } } } }`
+      )
+      .join("\n");
+    const query = `query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ${fields} } }`;
+    const response = ghJson(
+      [
+        "api",
+        "graphql",
+        "-f",
+        `query=${query}`,
+        "-F",
+        `owner=${owner}`,
+        "-F",
+        `name=${name}`,
+      ],
+      cwd
+    );
+    const repository = response.data?.repository ?? {};
 
-  return new Map(
-    issueNumbers.map((number) => {
+    for (const number of batch) {
       const parent = repository[`i${number}`]?.parent;
-      return [
+      parents.set(
         number,
         parent
           ? {
               number: parent.number,
               labels: parent.labels.nodes,
             }
-          : null,
-      ];
-    })
-  );
+          : null
+      );
+    }
+  }
+
+  return parents;
 }
 
 export function loadReadyFrontier(cwd) {
