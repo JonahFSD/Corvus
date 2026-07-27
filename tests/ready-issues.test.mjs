@@ -38,14 +38,14 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
     {
       number: 1,
       state: "OPEN",
-      labels: [{ name: "ready-for-agent" }],
+      labels: [{ name: "ready-for-agent" }, { name: "wayfinder:task" }],
       assignees: [],
       body: "Blocked by: None",
     },
     {
       number: 2,
       state: "OPEN",
-      labels: [{ name: "ready-for-human" }],
+      labels: [{ name: "ready-for-human" }, { name: "wayfinder:task" }],
       assignees: [],
       body: "Blocked by: None",
     },
@@ -59,14 +59,14 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
     {
       number: 4,
       state: "OPEN",
-      labels: [{ name: "ready-for-agent" }],
+      labels: [{ name: "ready-for-agent" }, { name: "wayfinder:task" }],
       assignees: [{ login: "owner" }],
       body: "Blocked by: None",
     },
     {
       number: 5,
       state: "CLOSED",
-      labels: ["ready-for-agent"],
+      labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: None",
     },
@@ -78,33 +78,45 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
   );
 });
 
+test("selectReadyIssues rejects ready labels outside a Wayfinder decision", () => {
+  const standaloneIssue = {
+    number: 1,
+    state: "OPEN",
+    labels: ["ready-for-agent"],
+    assignees: [],
+    body: "Blocked by: None",
+  };
+
+  assert.deepEqual(selectReadyIssues([standaloneIssue]), []);
+});
+
 test("selectReadyIssues returns only the deterministic unblocked frontier", () => {
   const issues = [
     {
       number: 34,
       state: "OPEN",
-      labels: ["ready-for-agent"],
+      labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: #20, #32",
     },
     {
       number: 13,
       state: "OPEN",
-      labels: ["ready-for-agent"],
+      labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: #10",
     },
     {
       number: 10,
       state: "OPEN",
-      labels: ["ready-for-agent"],
+      labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: None",
     },
     {
       number: 12,
       state: "OPEN",
-      labels: ["ready-for-agent"],
+      labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: #9",
     },
@@ -126,7 +138,7 @@ test("selectReadyIssues rejects unknown blockers", () => {
   const issue = {
     number: 10,
     state: "OPEN",
-    labels: ["ready-for-agent"],
+    labels: ["ready-for-agent", "wayfinder:task"],
     assignees: [],
     body: "Blocked by: #404",
   };

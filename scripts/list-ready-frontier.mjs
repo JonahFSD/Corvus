@@ -1,41 +1,6 @@
-import { execFileSync } from "node:child_process";
+import { loadReadyFrontier } from "./lib/load-ready-frontier.mjs";
 
-import { selectReadyIssues } from "./lib/ready-issues.mjs";
-
-function gh(args) {
-  return JSON.parse(
-    execFileSync("gh", args, {
-      cwd: process.cwd(),
-      encoding: "utf8",
-      maxBuffer: 64 * 1024 * 1024,
-    })
-  );
-}
-
-const candidates = gh([
-  "issue",
-  "list",
-  "--state",
-  "open",
-  "--label",
-  "ready-for-agent",
-  "--limit",
-  "1000",
-  "--json",
-  "number,title,body,labels,assignees,state,comments",
-]);
-const knownIssues = gh([
-  "issue",
-  "list",
-  "--state",
-  "all",
-  "--limit",
-  "1000",
-  "--json",
-  "number,state",
-]);
-
-const frontier = selectReadyIssues(candidates, knownIssues).map((issue) => ({
+const frontier = loadReadyFrontier(process.cwd()).map((issue) => ({
   number: issue.number,
   title: issue.title,
   body: issue.body,

@@ -26,6 +26,13 @@ export function parseBlockingIssueNumbers(body) {
   return { valid: true, issueNumbers };
 }
 
+const WAYFINDER_DECISION_LABELS = new Set([
+  "wayfinder:research",
+  "wayfinder:prototype",
+  "wayfinder:grilling",
+  "wayfinder:task",
+]);
+
 export function selectReadyIssues(issues, knownIssues = issues) {
   const statesByNumber = new Map(
     knownIssues.map((issue) => [Number(issue.number), issue.state])
@@ -41,6 +48,9 @@ export function selectReadyIssues(issues, knownIssues = issues) {
           typeof label === "string" ? label : label.name
         )
       );
+      const isWayfinderDecision = [...labels].some((label) =>
+        WAYFINDER_DECISION_LABELS.has(label)
+      );
 
       const blocking = parseBlockingIssueNumbers(issue.body);
       const hasOpenOrUnknownBlocker = blocking.issueNumbers.some((number) => {
@@ -50,6 +60,7 @@ export function selectReadyIssues(issues, knownIssues = issues) {
 
       return (
         labels.has("ready-for-agent") &&
+        isWayfinderDecision &&
         !labels.has("ready-for-human") &&
         !labels.has("needs-info") &&
         !labels.has("needs-triage") &&
