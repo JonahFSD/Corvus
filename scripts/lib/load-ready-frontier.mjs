@@ -12,6 +12,62 @@ function ghIssueList(args, cwd) {
   );
 }
 
+function ghJson(args, cwd) {
+  return JSON.parse(
+    execFileSync("gh", args, {
+      cwd,
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+    })
+  );
+}
+
+function loadNativeParents(issueNumbers, cwd) {
+  if (issueNumbers.length === 0) return new Map();
+
+  const { nameWithOwner } = ghJson(
+    ["repo", "view", "--json", "nameWithOwner"],
+    cwd
+  );
+  const [owner, name] = nameWithOwner.split("/");
+  const fields = issueNumbers
+    .map(
+      (number) =>
+        `i${number}: issue(number: ${number}) { parent { number labels(first: 20) { nodes { name } } } }`
+    )
+    .join("\n");
+  const query = `query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ${fields} } }`;
+  const response = ghJson(
+    [
+      "api",
+      "graphql",
+      "-f",
+      `query=${query}`,
+      "-F",
+      `owner=${owner}`,
+      "-F",
+      `name=${name}`,
+    ],
+    cwd
+  );
+  const repository = response.data?.repository ?? {};
+
+  return new Map(
+    issueNumbers.map((number) => {
+      const parent = repository[`i${number}`]?.parent;
+      return [
+        number,
+        parent
+          ? {
+              number: parent.number,
+              labels: parent.labels.nodes,
+            }
+          : null,
+      ];
+    })
+  );
+}
+
 export function loadReadyFrontier(cwd) {
   const candidates = ghIssueList(
     [
@@ -30,6 +86,14 @@ export function loadReadyFrontier(cwd) {
     ["--state", "all", "--limit", "1000", "--json", "number,state"],
     cwd
   );
+  const parents = loadNativeParents(
+    candidates.map((issue) => Number(issue.number)),
+    cwd
+  );
+  const children = candidates.map((issue) => ({
+    ...issue,
+    parent: parents.get(Number(issue.number)),
+  }));
 
-  return selectReadyIssues(candidates, knownIssues);
+  return selectReadyIssues(children, knownIssues);
 }

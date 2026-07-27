@@ -7,6 +7,11 @@ import {
   selectReadyIssues,
 } from "../scripts/lib/ready-issues.mjs";
 
+const wayfinderParent = {
+  number: 100,
+  labels: [{ name: "wayfinder:map" }],
+};
+
 test("parseBlockingIssueNumbers accepts the canonical blocker header", () => {
   assert.deepEqual(parseBlockingIssueNumbers("Blocked by: None\n\n# Ready"), {
     valid: true,
@@ -41,6 +46,7 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
       labels: [{ name: "ready-for-agent" }, { name: "wayfinder:task" }],
       assignees: [],
       body: "Blocked by: None",
+      parent: wayfinderParent,
     },
     {
       number: 2,
@@ -48,6 +54,7 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
       labels: [{ name: "ready-for-human" }, { name: "wayfinder:task" }],
       assignees: [],
       body: "Blocked by: None",
+      parent: wayfinderParent,
     },
     {
       number: 3,
@@ -55,6 +62,7 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
       labels: [{ name: "ready-for-agent" }, { name: "wayfinder:grilling" }],
       assignees: [],
       body: "Blocked by: None",
+      parent: wayfinderParent,
     },
     {
       number: 4,
@@ -62,6 +70,7 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
       labels: [{ name: "ready-for-agent" }, { name: "wayfinder:task" }],
       assignees: [{ login: "owner" }],
       body: "Blocked by: None",
+      parent: wayfinderParent,
     },
     {
       number: 5,
@@ -69,6 +78,7 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
       labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: None",
+      parent: wayfinderParent,
     },
   ];
 
@@ -78,16 +88,42 @@ test("selectReadyIssues permits only open, unassigned AFK tickets", () => {
   );
 });
 
-test("selectReadyIssues rejects ready labels outside a Wayfinder decision", () => {
-  const standaloneIssue = {
-    number: 1,
+test("selectReadyIssues requires both a Decision label and map parent", () => {
+  const base = {
     state: "OPEN",
-    labels: ["ready-for-agent"],
     assignees: [],
     body: "Blocked by: None",
   };
+  const issues = [
+    {
+      ...base,
+      number: 1,
+      labels: ["ready-for-agent"],
+      parent: wayfinderParent,
+    },
+    {
+      ...base,
+      number: 2,
+      labels: ["ready-for-agent", "wayfinder:task"],
+    },
+    {
+      ...base,
+      number: 3,
+      labels: ["ready-for-agent", "wayfinder:task"],
+      parent: { number: 101, labels: [{ name: "not-a-map" }] },
+    },
+    {
+      ...base,
+      number: 4,
+      labels: ["ready-for-agent", "wayfinder:task"],
+      parent: wayfinderParent,
+    },
+  ];
 
-  assert.deepEqual(selectReadyIssues([standaloneIssue]), []);
+  assert.deepEqual(
+    selectReadyIssues(issues).map((issue) => issue.number),
+    [4]
+  );
 });
 
 test("selectReadyIssues returns only the deterministic unblocked frontier", () => {
@@ -98,6 +134,7 @@ test("selectReadyIssues returns only the deterministic unblocked frontier", () =
       labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: #20, #32",
+      parent: wayfinderParent,
     },
     {
       number: 13,
@@ -105,6 +142,7 @@ test("selectReadyIssues returns only the deterministic unblocked frontier", () =
       labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: #10",
+      parent: wayfinderParent,
     },
     {
       number: 10,
@@ -112,6 +150,7 @@ test("selectReadyIssues returns only the deterministic unblocked frontier", () =
       labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: None",
+      parent: wayfinderParent,
     },
     {
       number: 12,
@@ -119,6 +158,7 @@ test("selectReadyIssues returns only the deterministic unblocked frontier", () =
       labels: ["ready-for-agent", "wayfinder:task"],
       assignees: [],
       body: "Blocked by: #9",
+      parent: wayfinderParent,
     },
   ];
   const knownIssues = [
@@ -141,6 +181,7 @@ test("selectReadyIssues rejects unknown blockers", () => {
     labels: ["ready-for-agent", "wayfinder:task"],
     assignees: [],
     body: "Blocked by: #404",
+    parent: wayfinderParent,
   };
 
   assert.deepEqual(selectReadyIssues([issue], [issue]), []);
