@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { loadReadyFrontier } from "../scripts/lib/load-ready-frontier.mjs";
 import {
   boundedPositiveInteger,
   parseBlockingIssueNumbers,
@@ -185,6 +186,55 @@ test("selectReadyIssues rejects unknown blockers", () => {
   };
 
   assert.deepEqual(selectReadyIssues([issue], [issue]), []);
+});
+
+test("loadReadyFrontier maps native map parentage before selection", () => {
+  const calls = [];
+  const gh = (args, cwd) => {
+    calls.push({ args, cwd });
+    if (args[0] === "repo") {
+      return { nameWithOwner: "owner/repository" };
+    }
+    if (args[0] === "api") {
+      return {
+        data: {
+          repository: {
+            i10: {
+              parent: {
+                number: 100,
+                labels: { nodes: [{ name: "wayfinder:map" }] },
+              },
+            },
+          },
+        },
+      };
+    }
+    if (args.includes("open")) {
+      return [
+        {
+          number: 10,
+          state: "OPEN",
+          title: "Fixture slice",
+          labels: ["ready-for-agent", "wayfinder:task"],
+          assignees: [],
+          body: "Blocked by: #4",
+          comments: [],
+        },
+      ];
+    }
+    return [
+      { number: 4, state: "CLOSED" },
+      { number: 10, state: "OPEN" },
+    ];
+  };
+
+  const frontier = loadReadyFrontier("/fixture/repository", gh);
+
+  assert.equal(frontier.length, 1);
+  assert.equal(frontier[0].number, 10);
+  assert.deepEqual(frontier[0].parent, wayfinderParent);
+  assert.equal(calls.length, 4);
+  assert.ok(calls.every((call) => call.cwd === "/fixture/repository"));
 });
 
 test("boundedPositiveInteger enforces an unattended iteration ceiling", () => {

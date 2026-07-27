@@ -2,17 +2,7 @@ import { execFileSync } from "node:child_process";
 
 import { selectReadyIssues } from "./ready-issues.mjs";
 
-function ghIssueList(args, cwd) {
-  return JSON.parse(
-    execFileSync("gh", ["issue", "list", ...args], {
-      cwd,
-      encoding: "utf8",
-      maxBuffer: 64 * 1024 * 1024,
-    })
-  );
-}
-
-function ghJson(args, cwd) {
+function executeGhJson(args, cwd) {
   return JSON.parse(
     execFileSync("gh", args, {
       cwd,
@@ -22,10 +12,10 @@ function ghJson(args, cwd) {
   );
 }
 
-function loadNativeParents(issueNumbers, cwd) {
+function loadNativeParents(issueNumbers, cwd, gh) {
   if (issueNumbers.length === 0) return new Map();
 
-  const { nameWithOwner } = ghJson(
+  const { nameWithOwner } = gh(
     ["repo", "view", "--json", "nameWithOwner"],
     cwd
   );
@@ -40,7 +30,7 @@ function loadNativeParents(issueNumbers, cwd) {
       )
       .join("\n");
     const query = `query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { ${fields} } }`;
-    const response = ghJson(
+    const response = gh(
       [
         "api",
         "graphql",
@@ -72,9 +62,11 @@ function loadNativeParents(issueNumbers, cwd) {
   return parents;
 }
 
-export function loadReadyFrontier(cwd) {
-  const candidates = ghIssueList(
+export function loadReadyFrontier(cwd, gh = executeGhJson) {
+  const candidates = gh(
     [
+      "issue",
+      "list",
       "--state",
       "open",
       "--label",
@@ -86,13 +78,23 @@ export function loadReadyFrontier(cwd) {
     ],
     cwd
   );
-  const knownIssues = ghIssueList(
-    ["--state", "all", "--limit", "1000", "--json", "number,state"],
+  const knownIssues = gh(
+    [
+      "issue",
+      "list",
+      "--state",
+      "all",
+      "--limit",
+      "1000",
+      "--json",
+      "number,state",
+    ],
     cwd
   );
   const parents = loadNativeParents(
     candidates.map((issue) => Number(issue.number)),
-    cwd
+    cwd,
+    gh
   );
   const children = candidates.map((issue) => ({
     ...issue,
