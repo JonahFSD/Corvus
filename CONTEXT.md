@@ -115,7 +115,7 @@ The Theological assistant's Palantir-style answer presentation in which every su
 _Avoid_: Global bibliography, persistent sources sidebar
 
 **Evidence component**:
-The message-scoped Apps SDK audit and exploration surface beneath the native ChatGPT answer. It preserves the minimal Palantir-style Sources dropdown plus an on-demand interactive graph of the analysis dependency path. Ordinary mode keeps it subordinate to native narration. In the explicitly labeled narration-safe mode, it becomes the sole substantive presentation of the unchanged canonical package while model-visible tool text is non-substantive; if ChatGPT cannot preserve that boundary, the tool fails closed. The Answer evidence package remains the canonical answer data for both surfaces.
+The message-scoped Apps SDK audit and exploration surface beneath the native ChatGPT answer. Its accepted narration-first structure leads with categorical outcome and obligation coverage, then a Sources disclosure with exact Citation details, then an on-demand graph of the analysis dependency path. Required-obligation gaps appear before audit details, and branch controls exist only for replayable receipt chains. Ordinary mode keeps the component subordinate to native narration. In the explicitly labeled narration-safe mode, it becomes the sole substantive presentation of the unchanged canonical package while model-visible tool text is non-substantive; if ChatGPT cannot preserve that boundary, the tool fails closed. The Answer evidence package remains the canonical answer data for both surfaces.
 _Avoid_: Persistent evidence dashboard, application shell
 
 **Evidence graph**:

@@ -2,6 +2,7 @@
 status: accepted
 date: 2026-07-27
 decision-artifact: prototype/issue-4-answer-package@b5a3bfe
+ui-decision-artifact: prototype/issue-5-evidence-component@f281e28
 ---
 
 # Keep substantive answer statements inside the evidence package
@@ -34,6 +35,14 @@ The terms in this section are canonical Corvus schema vocabulary. The fixture-st
 - **Operation output link**: a many-to-many provenance relationship connecting an Operation receipt to a Citation record, Evidence gap, or Answer statement it produced or selected. The relationship records the output role without duplicating either endpoint.
 - **Answer obligation**: a required unit of the user's requested answer, identified from each requested subquestion and, for an unscoped contested question, each materially distinct Position membership required by the versioned benchmark-category plan. It records `supported` or `unsupported` plus the Answer statement and Evidence-gap identifiers that determine that disposition.
 - **Pastoral-handoff policy record**: a non-evidentiary block carrying one or more reason codes, urgency, recommended actions, and references to existing Answer statements. Its reason codes are `personalDiscernment`, `sacramentalOrEcclesialJudgment`, `ongoingPastoralRelationship`, and `acuteSafetyOrCrisis`.
+
+## Evidence component presentation contract
+
+The validated default is the narration-first audit rail from `prototype/issue-5-evidence-component@f281e28`. Ordinary native ChatGPT narration remains visually primary. The message-scoped Evidence component begins with a compact status row containing the categorical Answer outcome and supported-obligation count, followed by bounded package facts such as release identity, material-operation count, scope defaults, and provider degradation. A Sources disclosure is the first audit surface and lists the deduplicated Citation records with exact locators, source identity, Evidence role context, and safe component-controlled details. The full question-to-answer Evidence graph is a separate on-demand disclosure derived from canonical package relationships. A statement-and-evidence ledger may appear inside that graph or Citation inspection flow, but it is not the default component structure.
+
+The component renders complete, partially answered, and abstained states from the same package contract. A required-obligation Evidence gap appears before the audit details and names the affected obligation; abstention replaces substantive native narration with an explicit abstention statement and still exposes the scoped gaps. Branch controls render only beside nodes with a complete replayable receipt chain. A non-replayable node carries a visible unavailable reason and never exposes an inert control that looks actionable.
+
+Narration-safe mode reverses presentation authority explicitly: model-visible content is non-substantive, ordinary native narration is absent, and the clearly labeled component-owned canonical answer precedes the same status, Sources, and graph surfaces. The component never keeps both substantive narrations visible. Responsive layouts may make scenario-independent audit controls horizontally scrollable only when every control remains keyboard reachable and receives a visible focus state; production tests must additionally prove the compact controls do not conceal status or Evidence gaps at supported widths.
 
 ## Scope invariants
 
