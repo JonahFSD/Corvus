@@ -22,8 +22,9 @@ When a skill says to publish a spec, map, or ticket, create a GitHub issue. Spec
 
 - The map is one parent issue labelled `wayfinder:map`.
 - Decision tickets are sub-issues labelled `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, or `wayfinder:task`.
-- Use native issue dependencies for blocking edges. If the API is unavailable, place `Blocked by: #N` at the top of the child body.
+- Use native issue dependencies for blocking edges. If the API is unavailable, the first non-empty body line must be exactly `Blocked by: None` or a comma-separated list such as `Blocked by: #12, #13`. Missing, malformed, duplicate, unknown, or open blocker references make the issue ineligible for unattended execution.
 - The frontier contains open, unblocked, unassigned children.
+- `npm run frontier` is the deterministic local view of that frontier. Sandcastle may further serialize frontier tickets whose implementation surfaces overlap, but it may not bypass declared blockers.
 - A session claims a ticket by assignment before doing any work.
 - Resolve by posting the answer, closing the child, and adding a one-line named pointer to the map.
 - Refer to issues by title plus number, never by a wall of bare numbers.

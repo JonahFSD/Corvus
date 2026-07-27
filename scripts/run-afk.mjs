@@ -44,9 +44,7 @@ function run(command, commandArgs, options = {}) {
   return result.stdout;
 }
 
-const dirty = run("git", ["status", "--porcelain", "--untracked-files=no"])
-  .split("\n")
-  .filter(Boolean);
+const dirty = run("git", ["status", "--porcelain"]).split("\n").filter(Boolean);
 if (dirty.length > 0) {
   throw new Error(
     "AFK execution requires a clean tracked worktree. Commit or stash changes first."
@@ -69,7 +67,17 @@ for (let iteration = 1; iteration <= maxIterations; iteration += 1) {
     "--json",
     "number,title,body,labels,assignees,state",
   ]);
-  const eligible = selectReadyIssues(JSON.parse(raw));
+  const known = run("gh", [
+    "issue",
+    "list",
+    "--state",
+    "all",
+    "--limit",
+    "1000",
+    "--json",
+    "number,state",
+  ]);
+  const eligible = selectReadyIssues(JSON.parse(raw), JSON.parse(known));
   const requested = args.get("--issue");
   const issue = requested
     ? eligible.find((candidate) => String(candidate.number) === requested)

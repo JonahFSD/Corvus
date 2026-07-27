@@ -4,15 +4,19 @@ Here are the open issues in the repo:
 
 <issues-json>
 
-!`gh issue list --state open --label ready-for-agent --limit 100 --json number,title,body,labels,assignees,comments --jq '[.[] | select((.assignees | length) == 0) | select(([.labels[].name] | index("ready-for-human")) == null) | {number, title, body, labels: [.labels[].name], assignees: [.assignees[].login], comments: [.comments[].body]}]'`
+!`node scripts/list-ready-frontier.mjs`
 
 </issues-json>
 
-The list above has already been filtered to issues ready for work.
+The list above has already been deterministically filtered to open, unassigned,
+correctly labelled issues whose declared `Blocked by:` references are all closed.
+Missing, malformed, duplicate, unknown, or open blockers fail closed before this
+planner runs.
 
 # TASK
 
-Analyze the open issues and build a dependency graph. For each issue, determine whether it **blocks** or **is blocked by** any other open issue.
+Analyze the frontier issues for additional implementation-order or merge-conflict
+constraints that cannot be expressed by their declared product dependencies.
 
 An issue B is **blocked by** issue A if:
 
@@ -20,7 +24,8 @@ An issue B is **blocked by** issue A if:
 - B and A modify overlapping files or modules, making concurrent work likely to produce merge conflicts
 - B's requirements depend on a decision or API shape that A will establish
 
-An issue is **unblocked** if it has zero blocking dependencies on other open issues.
+An issue is **unblocked** if it passed the declared dependency filter and has no
+additional overlap or implementation-order constraint with another frontier issue.
 
 For each unblocked issue, assign a branch name using the exact format `sandcastle/issue-{id}` (no slug or other suffix). This must be deterministic so that re-planning the same issue always produces the same branch name and accumulated progress is preserved.
 
