@@ -123,5 +123,4 @@ positions individually where their difference is material.
    checksum storage, and the intended public Challenge-submission territory.
 5. **No silent fallback.** When acquisition is incomplete, fixture work can
    continue with admissible public-domain artifacts, but a production answer
-   must emit its Evidence gap and abstain from the affected characterization.
-
+  must emit its Evidence gap and abstain from the affected characterization.

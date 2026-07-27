@@ -1,6 +1,6 @@
 # Convex as storage for immutable Ontology releases
 
-**Research date:** 2026-07-26  
+**Research date:** 2026-07-26
 **Scope:** Current first-party Convex documentation, supplemented only for the Vercel service-identity boundary by first-party Vercel documentation. The findings are applied by [ADR-0009](../docs/adr/0009-store-immutable-ontology-releases-in-convex.md).
 
 ## Decision in brief
