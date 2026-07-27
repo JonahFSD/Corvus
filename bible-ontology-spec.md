@@ -137,7 +137,7 @@ what the cited passage says and requires no tradition-bearing default or
 benchmark Position plan. The fixture must exercise at least:
 
 - preservation of the question as written;
-- one requested Answer obligation;
+- two Answer obligations for the requested first and second commandments;
 - two atomic Textual observations with direct Scripture Evidence links;
 - one derived Conclusion with explicit lineage to both observations;
 - exact Source, Artifact, edition, locator, content mode, and Citation identity;

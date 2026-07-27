@@ -1,5 +1,7 @@
 ---
-status: proposed
+status: accepted
+date: 2026-07-27
+decision-artifact: prototype/issue-4-answer-package@b5a3bfe
 ---
 
 # Keep substantive answer statements inside the evidence package
@@ -8,7 +10,7 @@ The prototype defaults to a fixture-first typed tree: Direct answer, Shared grou
 
 ## Proposed schema vocabulary
 
-The terms in this section are local to this proposed decision. They are promoted to the canonical glossary only after the fixtures and contract tests validate the schema and this ADR becomes accepted.
+The terms in this section are canonical Corvus schema vocabulary. The fixture-state prototype on `prototype/issue-4-answer-package` validated exact evidence identity, statement-owned links, Derived-statement lineage, scoped Gaps, operation output links, categorical outcomes, derived Sources, and a derived Evidence graph across successful, partially answered, abstained, and hostile-target cases. Production contract tests remain responsible for the complete schema and envelopes.
 
 - **Answer statement**: a human-readable atomic proposition belonging to exactly one semantic type. It is small enough that every attached Citation and Evidence role applies to the complete proposition.
 - **Textual observation**: a source-grounded Answer statement describing what cited Scripture explicitly says, contains, or juxtaposes.
@@ -147,6 +149,6 @@ Source-grounding roles are invalid on Derived statements, and derived-only roles
 - External navigation uses opener isolation and referrer protection. Source labels, locators, excerpts, and target text are escaped and rendered as data rather than markup or instructions.
 - A rejected external target is omitted and reported by validation. The Citation's exact locator remains inspectable in component-controlled details and is never replaced with an unsafe best-effort link.
 
-The minimum schema-driving fixture asks, “According to Matthew 22:37–40, which commandments does Jesus call greatest?” It uses reviewed public-domain World English Bible US fixture text and exact locators for Matthew 22:37–38 and Matthew 22:39–40. One requested Answer obligation is supported by two atomic Textual observations and a Derived Conclusion whose explicit lineage names both observations. Successful, degraded, abstaining, and hostile-data variants keep the question fixed so package-shape differences reflect evidence state rather than topic changes.
+The minimum schema-driving fixture asks, “According to Matthew 22:37–40, which commandments does Jesus call greatest?” It uses reviewed public-domain World English Bible US fixture text and exact locators for Matthew 22:37–38 and Matthew 22:39–40. Two Answer obligations represent the requested first and second commandments. Each is supported by its own atomic Textual observation, and the complete Answer includes a Derived Conclusion whose explicit lineage names both observations. Losing the second locator therefore produces `Partially answered`; losing both produces `Abstained`. Successful, degraded, abstaining, and hostile-data variants keep the question fixed so package-shape differences reflect evidence state rather than topic changes.
 
 After Issue #8 is accepted, the contested stress fixture asks, “Does baptism save, and should infants be baptized?” Its successful maximum-coverage case exercises Catholic, Eastern Orthodox, Oriental Orthodox, and all six Major Protestant families through the benchmark's materially distinct Position plan. It proves coverage and grouping behavior; it does not require every ordinary contested question to execute every family. A Position block may group memberships only when their independently supported propositions are materially equivalent; each membership owns its own statements and Evidence links, so the fixture does not create repetitive visible sections merely to display nominal coverage.

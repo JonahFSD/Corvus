@@ -67,7 +67,7 @@ Scope the user states in the question itself, such as a named tradition, canonic
 _Avoid_: Inferred beliefs, personalized theology, implicit tradition
 
 **Answer evidence package**:
-The citation-complete structured result returned by the Bible Ontology MCP, containing the answer content and evidence relationships needed to validate and present one answer. It identifies its Answer outcome and Evidence gaps and excludes or abstains from propositions materially affected by missing evidence. Its proposed schema is specified in ADR 0005 and does not become canonical domain language until fixture and contract validation accept that decision.
+The citation-complete structured result returned by the Bible Ontology MCP, containing the answer content and evidence relationships needed to validate and present one answer. It identifies its Answer outcome and Evidence gaps and excludes or abstains from propositions materially affected by missing evidence. Its canonical schema vocabulary and invariants are specified in accepted ADR 0005 and remain executable contract obligations for the Product runtime.
 _Avoid_: AI response, context blob
 
 **Citation**:
