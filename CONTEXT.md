@@ -27,8 +27,12 @@ Add product-domain terms only when they become necessary during grilling. Prefer
 ## Theological assistant
 
 **Theological assistant**:
-A best-in-class Christian theological answer-guidance system invoked and experienced entirely inside ChatGPT. It gives direct, balanced, evidence-grounded answers with explicit provenance, tradition-aware interpretation, and honest treatment of disagreement.
+A best-in-class Christian theological investigation and answer-guidance system invoked and experienced entirely inside ChatGPT. It compiles a question into the minimum sufficient responsible investigation for its declared scope, then gives a direct, balanced, evidence-grounded answer with explicit provenance, tradition-aware interpretation, and honest treatment of disagreement.
 _Avoid_: Bible chatbot, theology bot
+
+**Investigation compiler**:
+The Theological assistant understood as a transformation from a human question into a declared, versioned, challengeable investigation and then into a Canonical answer. Its intelligence lies in determining and satisfying the question's evidentiary burden, not in maximizing retrieval or generating plausible prose.
+_Avoid_: Research chatbot, RAG pipeline, answer generator
 
 **Christian scope**:
 The Theological assistant answers within Christian Scripture and Christian theological traditions. First-class Jewish, interfaith, comparative-religion, and non-Christian interpretive coverage is outside the current product boundary and may be considered later through an explicit scope change.
@@ -82,6 +86,14 @@ _Avoid_: Best source, trusted publisher score, universal source ranking
 Scope the user states in the question itself, such as a named tradition, canonical collection, translation, or historical period. The Theological assistant has no belief inference, user profile, hidden personalization, or default tradition setting. Without explicit scope it simply answers from shared textual ground and labels material disagreements; it asks a clarification only when the question itself is incomplete or genuinely cannot be answered responsibly as written.
 _Avoid_: Inferred beliefs, personalized theology, implicit tradition
 
+**Question frame**:
+The faithful interpretation of the question as written, including its explicit Analysis scope, material ambiguities, presuppositions, and the kind of answer it requests. It is the stable starting point from which Answer obligations are derived and may not be silently rewritten to fit available evidence.
+_Avoid_: Rewritten prompt, inferred intent, hidden scope
+
+**Answer obligation**:
+A question-derived requirement that the Canonical answer must satisfy, explicitly leave unresolved through an Evidence gap, or identify as outside the Question frame. Obligations make investigation completeness inspectable so polished prose cannot conceal an unanswered material part of the question.
+_Avoid_: Checklist item, desired claim, outline heading
+
 **Canonical answer**:
 The substantive theological response owned by the Theological assistant, including its claims, conclusions, qualifications, material positions, Citations, and unresolved Evidence gaps. ChatGPT may present and discuss it conversationally but cannot silently add claims, strengthen conclusions, collapse disagreements, or detach evidence from what it supports.
 _Avoid_: Host narration, model draft, research summary
@@ -126,9 +138,33 @@ _Avoid_: Automatic ingestion, search-result citation, curation-only research
 An investigation whose research depth expands with the question's ambiguity, difficulty, and material disagreement. Simple questions resolve directly, while difficult or contested questions trigger deeper research automatically without requiring the user to select a research mode.
 _Avoid_: Deep-research mode, fixed-depth answer, one-size-fits-all pipeline
 
+**Minimum sufficient responsible investigation**:
+The smallest investigation that responsibly satisfies or explicitly dispositions every Answer obligation for the declared scope, accessible evidence universe, and disclosed constraints. More research is required only when it could materially change the Canonical answer, add a required Position, or repair an important Evidence gap.
+_Avoid_: Maximum research, plausible-enough answer, arbitrary depth
+
+**Investigation plan**:
+The declared and versioned account of an investigation's Answer obligations, required evidence and Position lanes, admission and challenge rules, and stopping conditions. It is established before its operations execute but may be transparently amended when a material discovery changes the burden of the question.
+_Avoid_: Hidden reasoning plan, fixed workflow, provider call list
+
+**Plan amendment**:
+An attributable change from one Investigation-plan version to the next that records the material trigger, rationale, affected obligations, and added or removed requirements while preserving the prior version. Corvus may adapt its investigation but may not silently rewrite why it researched what it researched.
+_Avoid_: Plan mutation, retry, model improvisation
+
+**Authority resolution**:
+The determination that an exact source is fit to establish a particular claim for a named recognizing body, tradition, period, and scope, including any relevant continuing recognition, supersession, correction, qualification, or later reception. Age alone neither creates nor defeats authority.
+_Avoid_: Trusted source, source rank, newest source
+
+**Challenge**:
+A typed, evidence-addressable objection to a statement, derivation, Authority resolution, Position membership, or conclusion. A material Challenge identifies its kind and receives an explicit disposition; it is not an instruction to expose private chain-of-thought or merely ask a model to think again.
+_Avoid_: Second opinion, model self-critique, debate transcript
+
 **Material saturation**:
-The point at which required claims are well supported, material Christian positions and source conflicts are represented, and further research is unlikely to change the answer's central conclusions or repair an important Evidence gap. Operational ceilings may stop an investigation earlier, but they produce an explicit incomplete-research disclosure rather than silently redefining the work as complete.
+The Research-completion state in which every Answer obligation is supported or precisely dispositioned, material Christian positions and source conflicts are represented, material Challenges are resolved or disclosed, and the last planned research increment produced no material change. It is relative to the declared scope and accessible evidence universe, not a claim of exhaustive knowledge.
 _Avoid_: Exhaustive research, fixed operation limit, silent truncation
+
+**Research completion**:
+The explicit disposition of an Investigation as Material saturation, Scope exhausted with gaps, or Ceiling reached. Scope exhausted with gaps means the responsibly available investigation was performed but named obligations remain unresolved; Ceiling reached means an operational, rights, access, or safety limit stopped the plan early. Neither may be mislabeled as Material saturation.
+_Avoid_: Complete flag, token limit, research confidence
 
 **Runtime-admissible source**:
 An exact source artifact whose identity, edition, authority scope, locators, provenance, quality, and permitted uses have passed human rights review and deterministic Corpus-snapshot validation for the operation being performed. Public readability and `reference_only` metadata are not runtime admissibility; storage, transformations, provider processing, model input, excerpts, Citation targets, caching, embeddings, and embedded third-party material are authorized separately where applicable.
