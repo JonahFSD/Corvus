@@ -27,8 +27,16 @@ Add product-domain terms only when they become necessary during grilling. Prefer
 ## Theological assistant
 
 **Theological assistant**:
-An invokable ChatGPT app that answers difficult theological questions with Scripture-grounded citations, explicit provenance, tradition-aware interpretation, and honest treatment of disagreement.
+A best-in-class Christian theological answer-guidance system invoked and experienced entirely inside ChatGPT. It gives direct, balanced, evidence-grounded answers with explicit provenance, tradition-aware interpretation, and honest treatment of disagreement.
 _Avoid_: Bible chatbot, theology bot
+
+**Christian scope**:
+The Theological assistant answers within Christian Scripture and Christian theological traditions. First-class Jewish, interfaith, comparative-religion, and non-Christian interpretive coverage is outside the current product boundary and may be considered later through an explicit scope change.
+_Avoid_: Interfaith theology, comparative-religion assistant
+
+**Default reader**:
+An intelligent non-specialist who can follow ordinary conceptual reasoning but is not assumed to have formal theological education, knowledge of biblical languages, or familiarity with scholarly terminology. More technical depth follows from the question or an explicit request rather than a stored expertise profile.
+_Avoid_: Beginner mode, scholar mode, IQ-based audience
 
 **ChatGPT app**:
 The Theological assistant's end-user surface, built with the OpenAI Apps SDK as an MCP-backed app. ChatGPT owns invocation and conversational narration; optional message-scoped UI components render structured evidence inline inside ChatGPT. It is not a separate consumer chat application.
@@ -50,6 +58,10 @@ _Avoid_: Unanswerable question, controversial question
 An interpretation that applies an explicitly named theological tradition as a lens without presenting that lens as neutral or concealing significant disagreement. When no tradition is named, the Theological assistant does not silently select one. The Challenge submission guarantees first-class comparison across Catholic, Eastern Orthodox, Oriental Orthodox, and major Protestant families; narrower traditions are named only when explicit sources support them and their difference materially affects the answer.
 _Avoid_: Neutral theology, tradition setting
 
+**Scope-responsive balance**:
+The Theological assistant answers within an explicitly requested tradition when one is named and identifies consequential disagreement. Without an explicit tradition, it leads with shared ground and presents every materially distinct, well-evidenced position in proportion to its relevance, authority, and evidence rather than forcing equal coverage or inventing a compromise.
+_Avoid_: Both-sides balance, equal-time balance, synthesized consensus
+
 **Major Protestant family**:
 One of the six Protestant families guaranteed first-class coverage in the Challenge submission: Anglican, Baptist, Lutheran, Pentecostal, Reformed/Presbyterian, or Wesleyan/Methodist. Anabaptist, Adventist, Restorationist, and independent Evangelical traditions may be added when a benchmark case demonstrates the need.
 _Avoid_: Protestantism, denomination
@@ -62,9 +74,21 @@ _Avoid_: Comprehensive coverage, token representation
 A source's authority as claimed by a named tradition body, expressed through its source kind, recognizing body, recognition scope, tradition-namespaced status, and cited authority claim. Authorities from different traditions have no equivalence crosswalk or shared numeric rank.
 _Avoid_: Universal authority score, cross-tradition authority ranking
 
+**Claim-relative source authority**:
+A source's fitness to support a claim depends on the claim's type and scope: biblical text supports textual claims, a Christian body's own recognized sources support claims about its teaching, primary historical material supports direct historical claims, and qualified scholarship supports analysis appropriate to its field. No source, publisher, tradition, or commentator receives universal authority across claim types.
+_Avoid_: Best source, trusted publisher score, universal source ranking
+
 **Explicit analysis scope**:
 Scope the user states in the question itself, such as a named tradition, canonical collection, translation, or historical period. The Theological assistant has no belief inference, user profile, hidden personalization, or default tradition setting. Without explicit scope it simply answers from shared textual ground and labels material disagreements; it asks a clarification only when the question itself is incomplete or genuinely cannot be answered responsibly as written.
 _Avoid_: Inferred beliefs, personalized theology, implicit tradition
+
+**Canonical answer**:
+The substantive theological response owned by the Theological assistant, including its claims, conclusions, qualifications, material positions, Citations, and unresolved Evidence gaps. ChatGPT may present and discuss it conversationally but cannot silently add claims, strengthen conclusions, collapse disagreements, or detach evidence from what it supports.
+_Avoid_: Host narration, model draft, research summary
+
+**Authoritative answer surface**:
+The Theological assistant-controlled presentation of the complete Canonical answer inside ChatGPT. ChatGPT may provide non-substantive conversational framing and follow-up interaction, but a second host-generated substantive answer never competes with or rewrites the canonical one.
+_Avoid_: Host-narrated answer, duplicate answer, emergency fallback view
 
 **Answer evidence package**:
 The citation-complete structured result returned by the Bible Ontology MCP, containing the answer content and evidence relationships needed to validate and present one answer. It identifies its Answer outcome and Evidence gaps and excludes or abstains from propositions materially affected by missing evidence. Its canonical schema vocabulary and invariants are specified in accepted ADR 0005 and remain executable contract obligations for the Product runtime.
@@ -87,8 +111,24 @@ An identifiable primary confessional, conciliar, catechetical, canonical, or lit
 _Avoid_: Tradition knowledge, model knowledge
 
 **Tradition corpus**:
-The versioned, curated collection of primary documents and explicitly approved scholarship from which Tradition sources may be cited. Gloo may synthesize, compare, and identify tensions within this corpus, but arbitrary live-web material and unverified model recollection are not admissible evidence for the Challenge submission.
-_Avoid_: Web search results, model bibliography
+The versioned, curated core of primary documents and explicitly approved scholarship used repeatedly across theological investigations. It provides reliable default coverage but is not the exclusive evidence universe; an investigation may add exact sources through live research when they satisfy the same identity, authority, scope, provenance, and evidence standards.
+_Avoid_: Closed corpus, model bibliography
+
+**Live research source**:
+An exact source consulted during an investigation because the Tradition corpus does not provide sufficient evidence for the question. Its relevance and evidentiary authority come from the identified artifact and its scope, not from search rank, website availability, or model recommendation.
+_Avoid_: Web result, live-web evidence, model source
+
+**Per-investigation source admission**:
+The validation by which an exact Live research source becomes eligible to support the current Canonical answer after its identity, locator, authenticity, Claim-relative source authority, scope, provenance, and permitted use are established. Admission applies only to that investigation and does not silently add the source to the Tradition corpus or make it authoritative for other claims.
+_Avoid_: Automatic ingestion, search-result citation, curation-only research
+
+**Question-proportionate investigation**:
+An investigation whose research depth expands with the question's ambiguity, difficulty, and material disagreement. Simple questions resolve directly, while difficult or contested questions trigger deeper research automatically without requiring the user to select a research mode.
+_Avoid_: Deep-research mode, fixed-depth answer, one-size-fits-all pipeline
+
+**Material saturation**:
+The point at which required claims are well supported, material Christian positions and source conflicts are represented, and further research is unlikely to change the answer's central conclusions or repair an important Evidence gap. Operational ceilings may stop an investigation earlier, but they produce an explicit incomplete-research disclosure rather than silently redefining the work as complete.
+_Avoid_: Exhaustive research, fixed operation limit, silent truncation
 
 **Runtime-admissible source**:
 An exact source artifact whose identity, edition, authority scope, locators, provenance, quality, and permitted uses have passed human rights review and deterministic Corpus-snapshot validation for the operation being performed. Public readability and `reference_only` metadata are not runtime admissibility; storage, transformations, provider processing, model input, excerpts, Citation targets, caching, embeddings, and embedded third-party material are authorized separately where applicable.
