@@ -14,6 +14,7 @@
     "check": "npm run workflow:check && npm run format:check && npm run typecheck && npm test",
     "frontier": "node scripts/list-ready-frontier.mjs",
     "afk": "node scripts/run-afk.mjs",
+    "runs": "node scripts/show-runs.mjs",
     "review": "bash scripts/codex-review.sh",
     "sandbox:auth": "node scripts/bootstrap-sandbox-auth.mjs",
     "sandcastle:image": "sandcastle docker build-image --image-name corvus-agentic",

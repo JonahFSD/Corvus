@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JonahFSD/Corvus/schemas/afk-result.schema.json",
+  "title": "Corvus AFK agent result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reportedStatus",
+    "summary",
+    "humanDecisionRequired",
+    "claimedChecks",
+    "handoff"
+  ],
+  "properties": {
+    "reportedStatus": {
+      "type": "string",
+      "enum": ["complete", "blocked", "needs_human", "failed"]
+    },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "humanDecisionRequired": { "type": "boolean" },
+    "claimedChecks": {
+      "type": "array",
+      "maxItems": 20,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "handoff": { "type": "string", "minLength": 1, "maxLength": 4000 }
+  }
+}

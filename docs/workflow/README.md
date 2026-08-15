@@ -65,6 +65,26 @@ worktree/branch, launches one ephemeral `codex exec` process, forbids publishing
 and leaves the candidate for human diff review. The iteration limit is capped at
 20 and defaults to one.
 
+Every attempted issue run writes a local, permission-restricted Run Record under
+`.agent-runs/<run-id>/`. The manifest precedes Codex execution; native Codex
+JSONL and stderr remain separate; the agent's schema-validated final report is
+advisory; and the wrapper independently runs `npm run check` and inspects Git
+before classifying the result. Only `candidate_ready` may post the completion
+comment, and that outcome still requires human diff review.
+
+Inspect normalized records without opening raw traces by default:
+
+```bash
+npm run runs -- last
+npm run runs -- <run-id>
+```
+
+Use `--raw` only when the normalized summary and first-failure boundary are
+insufficient. Raw output may contain prompts, tool arguments, or command output
+and remains local and ignored by Git. See
+[Agent observability](../standards/agent-observability.md) for the normative data,
+authority, and incremental-instrumentation rules.
+
 Sandcastle factory:
 
 ```bash
