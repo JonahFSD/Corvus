@@ -66,10 +66,12 @@ and leaves the candidate for human diff review. The iteration limit is capped at
 20 and defaults to one.
 
 Every attempted issue run writes a local, permission-restricted Run Record under
-`.agent-runs/<run-id>/`. The manifest precedes Codex execution; native Codex
-JSONL and stderr remain separate; the agent's schema-validated final report is
-advisory; and the wrapper independently runs `npm run check` and inspects Git
-before classifying the result. Only `candidate_ready` may post the completion
+`.agent-runs/<run-id>/`. The manifest precedes issue assignment, worktree setup,
+and Codex execution. The summary records those external stages and the completion
+comment separately from the agent and verification processes. Native Codex JSONL
+and stderr remain separate; the agent's checked-in-schema-validated final report
+is advisory; and the wrapper independently runs `npm run check` and inspects Git
+before classifying the result. Only `candidate_ready` may attempt the completion
 comment, and that outcome still requires human diff review.
 
 Inspect normalized records without opening raw traces by default:

@@ -49,7 +49,11 @@ async function createFixture(t, scenario = {}) {
 import { appendFileSync } from "node:fs";
 appendFileSync(process.env.AFK_TEST_GH_CALLS, JSON.stringify(process.argv.slice(2)) + "\\n");
 const args = process.argv.slice(2);
-if (args[0] === "issue" && args[1] === "list" && args.includes("open")) {
+if (args[0] === "issue" && args[1] === "edit" && process.env.AFK_TEST_CLAIM_EXIT !== "0") {
+  process.exit(Number(process.env.AFK_TEST_CLAIM_EXIT));
+} else if (args[0] === "issue" && args[1] === "comment" && process.env.AFK_TEST_COMMENT_EXIT !== "0") {
+  process.exit(Number(process.env.AFK_TEST_COMMENT_EXIT));
+} else if (args[0] === "issue" && args[1] === "list" && args.includes("open")) {
   process.stdout.write(JSON.stringify([{
     number: 50,
     state: "OPEN",
@@ -84,6 +88,7 @@ if (args[0] === "status") {
 } else if (args[0] === "show-ref") {
   process.exit(1);
 } else if (args[0] === "worktree" && args[1] === "add") {
+  if (process.env.AFK_TEST_WORKTREE_EXIT !== "0") process.exit(Number(process.env.AFK_TEST_WORKTREE_EXIT));
   const target = args[2] === "-b" ? args[4] : args[2];
   mkdirSync(target, { recursive: true });
 } else if (args[0] === "rev-parse") {
@@ -158,6 +163,9 @@ process.exit(Number(process.env.AFK_TEST_CHECK_EXIT ?? "0"));
       AFK_TEST_CHECK_EXIT: String(scenario.checkExit ?? 0),
       AFK_TEST_CHECK_MODE: scenario.checkMode ?? "normal",
       AFK_TEST_REPORTED_STATUS: scenario.reportedStatus ?? "complete",
+      AFK_TEST_CLAIM_EXIT: String(scenario.claimExit ?? 0),
+      AFK_TEST_WORKTREE_EXIT: String(scenario.worktreeExit ?? 0),
+      AFK_TEST_COMMENT_EXIT: String(scenario.commentExit ?? 0),
       AFK_TEST_MODE: scenario.mode ?? "normal",
       AFK_TEST_ISSUE_TITLE: scenario.issueTitle ?? "Fixture Run Record",
       AFK_TEST_SECRET: "must-not-enter-normalized-records",
@@ -198,12 +206,17 @@ test("run-afk records a verified candidate and preserves native stdout", async (
     fixture.fixtureRoot
   );
   assert.equal(manifest.issueNumber, 50);
+  assert.equal(manifest.repository.nameWithOwner, "owner/repository");
   assert.equal(manifest.runner.version, "codex-cli 9.9.9");
   assert.equal(summary.outcome, "candidate_ready");
   assert.equal(summary.agent.resultValid, true);
   assert.equal(summary.verification.exitCode, 0);
   assert.deepEqual(summary.git.commits, ["b".repeat(40)]);
+  assert.equal(summary.git.inspectionSucceeded, true);
   assert.equal(summary.git.worktreeClean, true);
+  assert.equal(summary.externalStages.issueClaim.status, "succeeded");
+  assert.equal(summary.externalStages.worktreeSetup.status, "succeeded");
+  assert.equal(summary.externalStages.completionComment.status, "succeeded");
   assert.equal(summary.firstFailure, null);
   assert.match(
     await readFile(path.join(runDirectory, "raw", "codex.jsonl"), "utf8"),
@@ -295,10 +308,94 @@ for (const scenario of [
     const { summary } = await readOnlyRun(fixture.fixtureRoot);
     assert.equal(summary.outcome, scenario.outcome);
     assert.equal(summary.firstFailure.stage, scenario.failureStage);
+    assert.equal(summary.git.inspectionSucceeded, true);
+    if (scenario.name === "verification failure") {
+      assert.deepEqual(summary.git.commits, ["b".repeat(40)]);
+      assert.equal(summary.git.headRevision, "b".repeat(40));
+    }
     const ghCalls = await readFile(fixture.ghCallsPath, "utf8");
     assert.doesNotMatch(ghCalls, /"issue","comment","50"/);
   });
 }
+
+test("run-afk validates the final result against the checked-in JSON Schema", async (t) => {
+  const fixture = await createFixture(t);
+  const schemaPath = path.join(
+    fixture.fixtureRoot,
+    ".codex",
+    "schemas",
+    "afk-result.schema.json"
+  );
+  const schema = JSON.parse(await readFile(schemaPath, "utf8"));
+  schema.required.push("reviewToken");
+  schema.properties.reviewToken = { type: "string", minLength: 1 };
+  await writeFile(schemaPath, JSON.stringify(schema));
+
+  const result = spawnSync(
+    process.execPath,
+    [runAfkScript, "--max-iterations", "1", "--timeout-seconds", "5"],
+    { encoding: "utf8", env: fixture.environment }
+  );
+
+  assert.equal(result.status, 1);
+  const { summary } = await readOnlyRun(fixture.fixtureRoot);
+  assert.equal(summary.outcome, "invalid_agent_result");
+  assert.equal(summary.firstFailure.kind, "invalid_result");
+});
+
+for (const scenario of [
+  {
+    name: "issue claim failure",
+    options: { claimExit: 8 },
+    stage: "issueClaim",
+    failureStage: "issue_claim",
+  },
+  {
+    name: "worktree setup failure",
+    options: { worktreeExit: 9 },
+    stage: "worktreeSetup",
+    failureStage: "worktree_setup",
+  },
+  {
+    name: "completion comment failure",
+    options: { commentExit: 10 },
+    stage: "completionComment",
+    failureStage: "completion_comment",
+  },
+]) {
+  test(`run-afk records ${scenario.name}`, async (t) => {
+    const fixture = await createFixture(t, scenario.options);
+    const result = spawnSync(
+      process.execPath,
+      [runAfkScript, "--max-iterations", "1", "--timeout-seconds", "5"],
+      { encoding: "utf8", env: fixture.environment }
+    );
+
+    assert.equal(result.status, 1);
+    const { summary } = await readOnlyRun(fixture.fixtureRoot);
+    assert.equal(summary.outcome, "orchestration_failed");
+    assert.equal(summary.firstFailure.stage, scenario.failureStage);
+    assert.equal(summary.externalStages[scenario.stage].status, "failed");
+  });
+}
+
+test("run-afk does not mutate an issue when Run Record storage is unavailable", async (t) => {
+  const fixture = await createFixture(t);
+  await writeFile(
+    path.join(fixture.fixtureRoot, ".agent-runs"),
+    "not a directory"
+  );
+
+  const result = spawnSync(
+    process.execPath,
+    [runAfkScript, "--max-iterations", "1", "--timeout-seconds", "5"],
+    { encoding: "utf8", env: fixture.environment }
+  );
+
+  assert.equal(result.status, 1);
+  const ghCalls = await readFile(fixture.ghCallsPath, "utf8");
+  assert.doesNotMatch(ghCalls, /"issue","edit","50"/);
+});
 
 test("run-afk stops cleanly for a human decision without claiming completion", async (t) => {
   const fixture = await createFixture(t, {

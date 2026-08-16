@@ -40,10 +40,11 @@ Every attempted automated agent run must record:
 - the first failed boundary, without speculative root-cause analysis; and
 - references to raw execution artifacts.
 
-The manifest must exist before the agent process starts. Repository-owned JSON
-records carry an explicit `schemaVersion` and are validated before use.
-Interrupted and timed-out runs attempt to finalize a summary rather than
-masquerading as absent runs.
+The manifest must exist before the workflow's first consequential mutation,
+including issue assignment or worktree creation, and before the agent process
+starts. Repository-owned JSON records carry an explicit `schemaVersion` and are
+validated before use. Interrupted and timed-out runs attempt to finalize a
+summary rather than masquerading as absent runs.
 
 `candidate_ready` means only that the automated candidate met its documented
 mechanical contract. Human diff review remains mandatory.

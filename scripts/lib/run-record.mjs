@@ -4,16 +4,6 @@ import path from "node:path";
 
 import { z } from "zod";
 
-export const agentResultSchema = z
-  .object({
-    reportedStatus: z.enum(["complete", "blocked", "needs_human", "failed"]),
-    summary: z.string().min(1).max(2000),
-    humanDecisionRequired: z.boolean(),
-    claimedChecks: z.array(z.string().min(1).max(200)).max(20),
-    handoff: z.string().min(1).max(4000),
-  })
-  .strict();
-
 export const runOutcomes = new Set([
   "candidate_ready",
   "stopped_for_human",
@@ -44,6 +34,9 @@ export const manifestSchema = z
     workflow: z.literal("afk"),
     issueNumber: z.number().int().positive(),
     issueTitle: z.string().min(1),
+    repository: z
+      .object({ nameWithOwner: z.string().regex(/^[^/]+\/[^/]+$/) })
+      .strict(),
     baseRevision: z.string().min(1),
     branch: z.string().min(1),
     worktree: z.string().min(1),
@@ -76,6 +69,12 @@ const processResultSchema = z
   })
   .strict();
 
+const externalStageSchema = processResultSchema
+  .extend({
+    status: z.enum(["not_run", "not_needed", "succeeded", "failed"]),
+  })
+  .strict();
+
 export const summarySchema = z
   .object({
     schemaVersion: z.literal(1),
@@ -96,11 +95,20 @@ export const summarySchema = z
       .extend({ command: z.literal("npm run check") })
       .strict()
       .nullable(),
+    externalStages: z
+      .object({
+        issueClaim: externalStageSchema,
+        worktreeSetup: externalStageSchema,
+        completionComment: externalStageSchema,
+      })
+      .strict(),
     git: z
       .object({
         baseRevision: z.string().min(1),
         headRevision: z.string().min(1),
         commits: z.array(z.string().min(1)),
+        worktreePresent: z.boolean(),
+        inspectionSucceeded: z.boolean(),
         worktreeClean: z.boolean(),
       })
       .strict(),
@@ -157,12 +165,16 @@ export function createRunRecord({ root, issue, manifest }) {
     paths.manifest,
     manifestSchema.parse({ schemaVersion: 1, ...manifest })
   );
+  fs.writeFileSync(paths.stdout, "", { mode: 0o600 });
+  fs.writeFileSync(paths.stderr, "", { mode: 0o600 });
   fs.writeFileSync(paths.agentResult, "", { mode: 0o600 });
   return { runId, issue, paths };
 }
 
-export function readAgentResult(filePath) {
+export function readAgentResult(filePath, schemaPath) {
   try {
+    const checkedInSchema = JSON.parse(fs.readFileSync(schemaPath, "utf8"));
+    const agentResultSchema = z.fromJSONSchema(checkedInSchema);
     const parsed = JSON.parse(fs.readFileSync(filePath, "utf8"));
     const validation = agentResultSchema.safeParse(parsed);
     if (!validation.success) {

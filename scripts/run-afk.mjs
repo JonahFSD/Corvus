@@ -61,6 +61,41 @@ function commandVersion(command) {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
+function stageNotRun(status = "not_run") {
+  return {
+    status,
+    exitCode: null,
+    signal: null,
+    timedOut: false,
+    durationMs: null,
+  };
+}
+
+function runObserved(command, commandArgs, options = {}) {
+  const startedAt = Date.now();
+  const result = spawnSync(command, commandArgs, {
+    cwd: options.cwd ?? root,
+    encoding: "utf8",
+    timeout: options.timeout,
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  const succeeded = !result.error && result.status === 0;
+  return {
+    stdout: result.stdout ?? "",
+    error: result.error,
+    stage: {
+      status: succeeded ? "succeeded" : "failed",
+      exitCode: result.status,
+      signal: result.signal,
+      timedOut: result.error?.code === "ETIMEDOUT",
+      durationMs: Date.now() - startedAt,
+    },
+    message:
+      result.error?.message ??
+      `${command} exited ${result.status}: ${result.stderr ?? ""}`,
+  };
+}
+
 let activeChild = null;
 let interruptedSignal = null;
 
@@ -177,10 +212,6 @@ if (dirty.length > 0) {
   );
 }
 
-fs.mkdirSync(path.join(root, ".agent-runs", "worktrees"), {
-  recursive: true,
-});
-
 for (let iteration = 1; iteration <= maxIterations; iteration += 1) {
   const eligible = loadReadyFrontier(root);
   const requested = args.get("--issue");
@@ -193,8 +224,6 @@ for (let iteration = 1; iteration <= maxIterations; iteration += 1) {
     break;
   }
 
-  run("gh", ["issue", "edit", String(issue.number), "--add-assignee", "@me"]);
-
   const branch = `codex/issue-${issue.number}`;
   const worktree = path.join(
     root,
@@ -202,22 +231,17 @@ for (let iteration = 1; iteration <= maxIterations; iteration += 1) {
     "worktrees",
     `issue-${issue.number}`
   );
-  if (!fs.existsSync(worktree)) {
-    const branchExists =
-      spawnSync("git", ["show-ref", "--verify", `refs/heads/${branch}`], {
-        cwd: root,
-      }).status === 0;
-    run(
-      "git",
-      branchExists
-        ? ["worktree", "add", worktree, branch]
-        : ["worktree", "add", "-b", branch, worktree, "HEAD"]
-    );
-  }
-
-  const baseRevision = run("git", ["rev-parse", "HEAD"], {
-    cwd: worktree,
-  }).trim();
+  const rootRevision = run("git", ["rev-parse", "HEAD"]).trim();
+  const branchLookup = spawnSync(
+    "git",
+    ["rev-parse", "--verify", `refs/heads/${branch}`],
+    { cwd: root, encoding: "utf8" }
+  );
+  const branchExists = branchLookup.status === 0;
+  const baseRevision = branchExists ? branchLookup.stdout.trim() : rootRevision;
+  const { nameWithOwner } = JSON.parse(
+    run("gh", ["repo", "view", "--json", "nameWithOwner"])
+  );
   const startedAt = new Date().toISOString();
   const runId = createRunId(issue.number);
   const prompt = `
@@ -248,6 +272,7 @@ the local candidate is committed and ready for deterministic verification.
       workflow: "afk",
       issueNumber: issue.number,
       issueTitle: issue.title,
+      repository: { nameWithOwner },
       baseRevision,
       branch,
       worktree: relativeWorktree(worktree),
@@ -273,14 +298,59 @@ the local candidate is committed and ready for deterministic verification.
   let agent = null;
   let agentReport = { valid: false, value: null, error: "not read" };
   let verification = null;
+  const externalStages = {
+    issueClaim: stageNotRun(),
+    worktreeSetup: stageNotRun(),
+    completionComment: stageNotRun(),
+  };
   let git = {
     baseRevision,
     headRevision: baseRevision,
     commits: [],
+    worktreePresent: false,
+    inspectionSucceeded: false,
     worktreeClean: false,
   };
 
   try {
+    const claim = runObserved("gh", [
+      "issue",
+      "edit",
+      String(issue.number),
+      "--add-assignee",
+      "@me",
+    ]);
+    externalStages.issueClaim = claim.stage;
+    if (claim.stage.status === "failed") {
+      firstFailure = processFailure(
+        "issue_claim",
+        "nonzero_exit",
+        claim.message
+      );
+      throw new Error(claim.message);
+    }
+
+    if (fs.existsSync(worktree)) {
+      externalStages.worktreeSetup = stageNotRun("not_needed");
+    } else {
+      fs.mkdirSync(path.dirname(worktree), { recursive: true });
+      const setup = runObserved(
+        "git",
+        branchExists
+          ? ["worktree", "add", worktree, branch]
+          : ["worktree", "add", "-b", branch, worktree, "HEAD"]
+      );
+      externalStages.worktreeSetup = setup.stage;
+      if (setup.stage.status === "failed") {
+        firstFailure = processFailure(
+          "worktree_setup",
+          "nonzero_exit",
+          setup.message
+        );
+        throw new Error(setup.message);
+      }
+    }
+
     agent = await runStreamed(
       codexCommand,
       [
@@ -334,7 +404,7 @@ the local candidate is committed and ready for deterministic verification.
         `Codex exited ${agent.exitCode ?? "null"}${agent.signal ? ` (${agent.signal})` : ""}`
       );
     } else {
-      agentReport = readAgentResult(record.paths.agentResult);
+      agentReport = readAgentResult(record.paths.agentResult, schemaPath);
       if (!agentReport.valid) {
         outcome = "invalid_agent_result";
         firstFailure = processFailure(
@@ -391,38 +461,7 @@ the local candidate is committed and ready for deterministic verification.
             `npm run check exited ${verification.exitCode ?? "null"}${verification.signal ? ` (${verification.signal})` : ""}`
           );
         } else {
-          const headRevision = run("git", ["rev-parse", "HEAD"], {
-            cwd: worktree,
-          }).trim();
-          const commits = run(
-            "git",
-            ["rev-list", "--reverse", `${baseRevision}..${headRevision}`],
-            { cwd: worktree }
-          )
-            .split("\n")
-            .filter(Boolean);
-          const worktreeClean =
-            run("git", ["status", "--porcelain"], { cwd: worktree }).trim()
-              .length === 0;
-          git = { baseRevision, headRevision, commits, worktreeClean };
-
-          if (commits.length === 0) {
-            outcome = "no_change";
-            firstFailure = processFailure(
-              "git_inspection",
-              "no_commit",
-              "Agent reported completion but produced no commit"
-            );
-          } else if (!worktreeClean) {
-            outcome = "verification_failed";
-            firstFailure = processFailure(
-              "git_inspection",
-              "dirty_worktree",
-              "Candidate worktree is not clean"
-            );
-          } else {
-            outcome = "candidate_ready";
-          }
+          outcome = "candidate_ready";
         }
       }
     }
@@ -433,52 +472,115 @@ the local candidate is committed and ready for deterministic verification.
       "exception",
       error instanceof Error ? error.message : String(error)
     );
-  } finally {
-    const finishedAt = new Date().toISOString();
-    finalizeRun(record, {
-      runId,
-      outcome,
-      startedAt,
-      finishedAt,
-      durationMs:
-        new Date(finishedAt).getTime() - new Date(startedAt).getTime(),
-      agent: {
-        exitCode: agent?.exitCode ?? null,
-        signal: agent?.signal ?? null,
-        timedOut: agent?.timedOut ?? false,
-        durationMs: agent?.durationMs ?? null,
-        reportedStatus: agentReport.value?.reportedStatus ?? null,
-        resultValid: agentReport.valid,
-      },
-      verification: verification
-        ? {
-            command: verification.command,
-            exitCode: verification.exitCode,
-            signal: verification.signal,
-            timedOut: verification.timedOut,
-            durationMs: verification.durationMs,
-          }
-        : null,
-      git,
-      artifacts: {
-        manifest: "manifest.json",
-        rawTrace: "raw/codex.jsonl",
-        stderr: "raw/codex.stderr.log",
-        agentResult: "agent-result.json",
-        checkLog: verification ? "check.log" : null,
-      },
-      firstFailure,
-    });
+  }
+
+  try {
+    if (fs.existsSync(worktree)) {
+      const headRevision = run("git", ["rev-parse", "HEAD"], {
+        cwd: worktree,
+      }).trim();
+      const commits = run(
+        "git",
+        ["rev-list", "--reverse", `${baseRevision}..${headRevision}`],
+        { cwd: worktree }
+      )
+        .split("\n")
+        .filter(Boolean);
+      const worktreeClean =
+        run("git", ["status", "--porcelain"], { cwd: worktree }).trim()
+          .length === 0;
+      git = {
+        baseRevision,
+        headRevision,
+        commits,
+        worktreePresent: true,
+        inspectionSucceeded: true,
+        worktreeClean,
+      };
+
+      if (outcome === "candidate_ready" && commits.length === 0) {
+        outcome = "no_change";
+        firstFailure = processFailure(
+          "git_inspection",
+          "no_commit",
+          "Agent reported completion but produced no commit"
+        );
+      } else if (outcome === "candidate_ready" && !worktreeClean) {
+        outcome = "verification_failed";
+        firstFailure = processFailure(
+          "git_inspection",
+          "dirty_worktree",
+          "Candidate worktree is not clean"
+        );
+      }
+    } else if (outcome === "candidate_ready") {
+      throw new Error("Candidate worktree does not exist");
+    }
+  } catch (error) {
+    if (outcome === "candidate_ready") outcome = "orchestration_failed";
+    firstFailure ??= processFailure(
+      "git_inspection",
+      "exception",
+      error instanceof Error ? error.message : String(error)
+    );
   }
 
   if (outcome === "candidate_ready") {
-    run("gh", [
+    const comment = runObserved("gh", [
       "issue",
       "comment",
       String(issue.number),
       "--body",
       `Codex completed a local reviewed candidate on branch \`${branch}\`. Human diff review is required before merge or closure.`,
     ]);
+    externalStages.completionComment = comment.stage;
+    if (comment.stage.status === "failed") {
+      outcome = "orchestration_failed";
+      firstFailure = processFailure(
+        "completion_comment",
+        "nonzero_exit",
+        comment.message
+      );
+    }
+  }
+
+  const finishedAt = new Date().toISOString();
+  finalizeRun(record, {
+    runId,
+    outcome,
+    startedAt,
+    finishedAt,
+    durationMs: new Date(finishedAt).getTime() - new Date(startedAt).getTime(),
+    agent: {
+      exitCode: agent?.exitCode ?? null,
+      signal: agent?.signal ?? null,
+      timedOut: agent?.timedOut ?? false,
+      durationMs: agent?.durationMs ?? null,
+      reportedStatus: agentReport.value?.reportedStatus ?? null,
+      resultValid: agentReport.valid,
+    },
+    verification: verification
+      ? {
+          command: verification.command,
+          exitCode: verification.exitCode,
+          signal: verification.signal,
+          timedOut: verification.timedOut,
+          durationMs: verification.durationMs,
+        }
+      : null,
+    externalStages,
+    git,
+    artifacts: {
+      manifest: "manifest.json",
+      rawTrace: "raw/codex.jsonl",
+      stderr: "raw/codex.stderr.log",
+      agentResult: "agent-result.json",
+      checkLog: verification ? "check.log" : null,
+    },
+    firstFailure,
+  });
+
+  if (outcome === "candidate_ready") {
     console.log(
       `Issue #${issue.number} completed on ${branch}; human review required.`
     );

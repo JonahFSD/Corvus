@@ -62,6 +62,7 @@ function duration(value) {
 const lines = [
   `Issue #${manifest.issueNumber}: ${display(manifest.issueTitle)}`,
   `Run: ${runId}`,
+  `Repository: ${display(manifest.repository.nameWithOwner)}`,
   `Branch: ${manifest.branch}`,
   `Base: ${manifest.baseRevision}`,
   `Head: ${summary.git.headRevision}`,
@@ -80,6 +81,13 @@ if (summary.verification) {
     `  Exit: ${summary.verification.exitCode ?? summary.verification.signal ?? "not started"}`
   );
 }
+
+lines.push(
+  "External stages",
+  `  Issue claim: ${summary.externalStages.issueClaim.status}`,
+  `  Worktree setup: ${summary.externalStages.worktreeSetup.status}`,
+  `  Completion comment: ${summary.externalStages.completionComment.status}`
+);
 
 lines.push(
   `Commits: ${summary.git.commits.length}`,
